@@ -1,0 +1,123 @@
+\renewcommand{\chaptertitle}{Combinators for Fun and Profit}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  10–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\urbitfont The Nock Book}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+\begin{abstract}
+
+\end{abstract}
+
+The first section of this chapter will introduce the basic \texttt{SKI} and \texttt{BCKW} combinator calculi and examine how they can represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
+
+\section{Combinators in Computing}
+
+The pioneers of computing elaborated three complementary visions:
+
+\begin{enumerate}
+  \item  The Turing machine, a simple abstract machine that can compute anything computable.
+  \item  The lambda calculus, a pure functional language based on substitution and abstraction.
+  \item  Combinatory logic, a variable-free functional language based on combinators.
+\end{enumerate}
+
+Logicians early demonstrated the equivalence of these approaches, but particular formulations are still preferred for particular tasks.  The Turing machine is the most intuitive model of computation, and is often used to prove computability results.  The lambda calculus is the basis of many functional programming languages, such as Lisp, Scheme, and Haskell.  Combinatory logic is less widely used in practice, but has a long history in mathematical logic and type theory.  It is also the basis of Nock.
+
+One of the most fundamental objectives of combinatory logic is to eliminate variables.
+
+
+\subsection[The \texttt{SKI} calculus]{The SKI Calculus}
+
+Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \texttt{SKI} combinator calculus, which has three combinators:
+
+
+\texttt{I}
+
+\texttt{K}
+
+\texttt{S}
+
+
+
+\texttt{B}
+
+\texttt{C}
+
+\texttt{W}
+
+\texttt{U}
+
+\texttt{Y}
+
+Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
+
+% https://stackoverflow.com/questions/7368507/expressing-y-in-term-of-ski-combinators-in-javascript
+
+Combinator calculi are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  Thus it is better to think of Nock not as a bare programming language, but as a standard of computation which can \emph{in extremis} be used as the computation itself.
+
+\section{Nock Opcodes as Combinator}
+
+\section{\texttt{I} Identity = Opcode 0}
+
+Nock's binary tree addressing is fully general and yields the identity combinator \texttt{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see.)
+
+\section{\texttt{K} Constant = Opcode 1}
+
+\section{\texttt{S} Substitution = Opcode 2}
+
+
+\section{The Axiomatic Operators}
+
+Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.
+
+opcode 3, 4, 5, 10
+
+
+\section{Idioms \& Design Patterns}
+
+Several of the combinators we examined above are not present in Nock simpliciter, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
+
+
+Recursion we get for free with opcode 0.
+
+$\mu$-recursive functions
+
+
+\section{Virtualization}
+
+Nock is a crash-only pure language, which means at the base level it can only succeed and yield a new noun:  no side effects, no exceptions, no state.  Like a castaway on a desert island, we must build everything we need from raw materials at hand.
+
+Nock has one trick built in and a couple of design patterns to help us get there:
+
+\begin{enumerate}
+  \item  Opcode 11 lets us send a hint to the runtime, which can be used to trigger side effects.  The Nock expression formally doesn't know anything about these, but we can use them to print results, read input, and so forth.
+  \item  The runtime can maintain state outside of Nock and supply it as a subject to subsequent Nock expressions.  We will do a lot more with this later, but we want to highlight it as a key affordance now.
+  \item  The virtualization pattern means that we can run Nock in Nock.
+\end{enumerate}
+
+Opcode 11 can encode anything we want:  the result of a hint is used by the runtime, and so anything the runtime is willing to work with can be produced.
+
+
+The magic formula at the beating heart of a practical Nock operating system is simply:
+
+\begin{lstlisting}[style=listingcode]
+*([state -.events] [9 2 10 [6 0 3] 0 2])
+\end{lstlisting}
+
+\noindent
+That is, apply the Nock formula against a subject pair consisting of the current state and the head of the list of events to process.

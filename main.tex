@@ -1,80 +1,61 @@
-\documentclass[twoside]{article}
+\documentclass[letterpaper,twoside,12pt]{book}
 
-\usepackage{ustj}
-
+\usepackage{ustj} % Custom package for styling
+% \usepackage[utf8]{inputenc} % Character encoding
+% \usepackage{fancyhdr} % Custom headers/footers (already loaded in ustj, but explicit for clarity)
+\usepackage{bibentry} % For bibliography
+\nobibliography* % Prevent bibliography errors
 \addbibresource{mss.bib}
 
-\newcommand{\authorname}{Thomas Lindstrom-Vautrin}
-\newcommand{\authorpatp}{\patp{niblyx-malnus}}
-% \newcommand{\affiliation}{Kamp Kikakee}
+% Define author commands
+\newcommand{\authorname}{N.\ E.\ Davis}
+\newcommand{\authorpatp}{\patp{lagrev-nocfep}}
 
-%  Make first page footer:
-\fancypagestyle{firststyle}{%
-\fancyhf{}% Clear header/footer
-\fancyhead{}
-\fancyfoot[L]{{\footnotesize
-              %% We toggle between these:
-              % Manuscript submitted for review.\\
-              {\it Urbit Systems Technical Journal} II:1 (2025):  46–69. \\
-              ~ \\
-              Address author correspondence to \authorpatp.
-              }}
-}
-%  Arrange subsequent pages:
-\fancyhf{}
-\fancyhead[LE]{{\urbitfont Urbit Systems Technical Journal}}
-\fancyhead[RO]{Deriving Nock Opcodes}
-\fancyfoot[LE,RO]{\thepage}
+% Define custom abstract environment for chapters
+\newenvironment{abstract}
+  {\par\noindent\textbf{Abstract}\par\nobreak\smallskip}
+  {\par\bigskip}
 
-%%MANUSCRIPT
-\title{Deriving Nock Opcodes 6–11}
-\author{\authorname~\authorpatp}
+% Define chaptertitle command for use in headers
+\newcommand{\chaptertitle}{}
+
+%% MANUSCRIPT
+\title{NOCK \& THE ART OF SOLID-STATE COMPUTING\\An Enquiry into the Virtual}
+\author{\authorname \\ \authorpatp}
 \date{}
 
 \begin{document}
 
+\frontmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\fancyhf{}
+\fancyhead[LE]{}
+\fancyhead[RO]{}
+\fancyfoot[LE,RO]{}
+
+% Title page
 \maketitle
-\thispagestyle{firststyle}
 
-\begin{abstract}
-  Since Nock opcodes 0 through 5 are Turing complete, it should be possible to derive the operations of the remaining opcodes 6 through 11 from them.  In this article, we expound on this idea and provides a detailed derivation of each opcode.
-\end{abstract}
+% Dedication and copyright page
+\cleardoublepage
+\thispagestyle{empty} % No page number on this page
 
-% We will adjust page numbering in final editing.
-\pagenumbering{arabic}
-\setcounter{page}{46}
-
+% Table of contents
 \tableofcontents
 
-\chapter{The Roots of Computing}
+\mainmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \input{txt/roots_of_computing}
-
-\chapter{Practical Combinators}
 \input{txt/practical_combinators}
-
-\chapter{An Interpreter Layer}
 \input{txt/interpreter_runtime}
-
-\chapter{Higher Level Language}
 \input{txt/higher_level_language}
-
-\chapter{Bootstrapping Moon}
 \input{txt/bootstrapping}
-
-\chapter{A Type System}
 \input{txt/type_system}
-
-\chapter{The Event Loop}
 \input{txt/event_loop}
-
-\chapter{A Virtual Machine}
 \input{txt/toy_runtime}
-
-\chapter{Userspace}
 \input{txt/userspace}
-
-\chapter{Hints and Jets}
 \input{txt/hints_and_jets}
+
+\backmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
 \chapter{Hoon Proper}

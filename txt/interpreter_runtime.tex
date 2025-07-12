@@ -1,0 +1,27 @@
+\renewcommand{\chaptertitle}{Interpreter Runtime}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  10–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\urbitfont The Nock Book}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+\begin{abstract}
+
+\end{abstract}
+
+Now that we have established a firm foundation for idiomatic programming in Nock, we can build an interpreter using a higher-level language to execute Nock formulas.  At this point, we will build the simplest possible Nock interpreter, a tree-walking interpreter.  This requires a cursor and some basic memory management but not much more.  We will implement some minimalist static hints to permit side effects like output.
