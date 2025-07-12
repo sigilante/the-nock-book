@@ -22,6 +22,9 @@
 % \let\oldtextsc\textsc
 % \renewcommand{\textsc}[1]{\scalebox{1.25}{\oldtextsc{#1}}}
 \newcommand{\ssc}[1]{{\slantedsmallcapsfont\textsc{#1}}}
+% Special version of ss03 for Urbit Sans
+\newfontfamily\combfont{Urbit Sans Mono TT Bold}[Scale=MatchLowercase,RawFeature=+ss03]
+\newcommand{\textct}[1]{{\combfont #1}}
 
 \usepackage{listings}
 \usepackage[dvipsnames]{xcolor}

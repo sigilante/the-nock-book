@@ -46,19 +46,27 @@ One of the most fundamental objectives of combinatory logic is to eliminate vari
 Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \texttt{SKI} combinator calculus, which has three combinators:
 
 
-\texttt{I}
+The identity combinator \texttt{I} is conventionally written \texttt{Ix = x}.  This simply means that it returns the result of its evaluation unchanged.
 
 \texttt{K}
 
 \texttt{S}
 
 
+The \texttt{SKI} system is Turing complete \citep{blah}, meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equivalent \texttt{SKI} expression and vice versa.  (cite church-turing thesis stuff)
+
+% https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
+
+% https://en.wikipedia.org/wiki/B,_C,_K,_W_system
+% https://dkeenan.com/Lambda/index.htm
+
+\subsection{The \textct{BCKW} calculus}
 
 \texttt{B}
 
-\texttt{C}
+\textct{C}
 
-\texttt{W}
+\textct{W}
 
 \texttt{U}
 
@@ -66,22 +74,30 @@ Computable functions can be expressed using minimal sets of combinators.  Many l
 
 Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
 
+iota combinator
+% TODO: iota from "dotless i" head and "pi" tail
+
 % https://stackoverflow.com/questions/7368507/expressing-y-in-term-of-ski-combinators-in-javascript
 
-Combinator calculi are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  Thus it is better to think of Nock not as a bare programming language, but as a standard of computation which can \emph{in extremis} be used as the computation itself.
+Combinator calculi are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  Thus it is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
 
 \section{Nock Opcodes as Combinator}
 
-\section{\texttt{I} Identity = Opcode 0}
+\subsection{\texttt{I} Identity = Opcode 0}
 
 Nock's binary tree addressing is fully general and yields the identity combinator \texttt{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see.)
 
-\section{\texttt{K} Constant = Opcode 1}
+Conceptually, we could write this in a hybrid form between combinators and Nock thus:
 
-\section{\texttt{S} Substitution = Opcode 2}
+\begin{lstlisting}[style=listingcode]
+  *[a I b] == [0 1]
+\end{lstlisting}
 
+\subsection{\texttt{K} Constant = Opcode 1}
 
-\section{The Axiomatic Operators}
+\subsection{\texttt{S} Substitution = Opcode 2}
+
+\subsection{The Axiomatic Operators}
 
 Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.
 
@@ -90,7 +106,18 @@ opcode 3, 4, 5, 10
 
 \section{Idioms \& Design Patterns}
 
-Several of the combinators we examined above are not present in Nock simpliciter, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
+Several of the combinators we examined above are not present in Nock \emph{simpliciter}, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
+
+\subsection{\texttt{C} Reversal}
+
+C = S (S (K (S (K S) K)) S) (K K)
+
+In Nock, the reversal combinator \texttt{C} is almost free due to the binary tree nature of cells.
+
+\begin{lstlisting}[style=listingcode]
+  *[a C b] == *[7 [0 3] [[0 3] [0 2]]]
+  *[a C b] == *[[0 7] [0 6]]
+\end{lstlisting}
 
 
 Recursion we get for free with opcode 0.
