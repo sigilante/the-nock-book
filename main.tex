@@ -1,0 +1,97 @@
+\documentclass[twoside]{article}
+
+\usepackage{ustj}
+
+\addbibresource{mss.bib}
+
+\newcommand{\authorname}{Thomas Lindstrom-Vautrin}
+\newcommand{\authorpatp}{\patp{niblyx-malnus}}
+% \newcommand{\affiliation}{Kamp Kikakee}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              {\it Urbit Systems Technical Journal} II:1 (2025):  46–69. \\
+              ~ \\
+              Address author correspondence to \authorpatp.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\urbitfont Urbit Systems Technical Journal}}
+\fancyhead[RO]{Deriving Nock Opcodes}
+\fancyfoot[LE,RO]{\thepage}
+
+%%MANUSCRIPT
+\title{Deriving Nock Opcodes 6–11}
+\author{\authorname~\authorpatp}
+\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firststyle}
+
+\begin{abstract}
+  Since Nock opcodes 0 through 5 are Turing complete, it should be possible to derive the operations of the remaining opcodes 6 through 11 from them.  In this article, we expound on this idea and provides a detailed derivation of each opcode.
+\end{abstract}
+
+% We will adjust page numbering in final editing.
+\pagenumbering{arabic}
+\setcounter{page}{46}
+
+\tableofcontents
+
+\chapter{The Roots of Computing}
+\input{txt/roots_of_computing}
+
+\chapter{Practical Combinators}
+\input{txt/practical_combinators}
+
+\chapter{An Interpreter Layer}
+\input{txt/interpreter_runtime}
+
+\chapter{Higher Level Language}
+\input{txt/higher_level_language}
+
+\chapter{Bootstrapping Moon}
+\input{txt/bootstrapping}
+
+\chapter{A Type System}
+\input{txt/type_system}
+
+\chapter{The Event Loop}
+\input{txt/event_loop}
+
+\chapter{A Virtual Machine}
+\input{txt/toy_runtime}
+
+\chapter{Userspace}
+\input{txt/userspace}
+
+\chapter{Hints and Jets}
+\input{txt/hints_and_jets}
+
+\appendix
+\chapter{Hoon Proper}
+\input{txt/hoon_proper}
+
+% 1. The roots of computing 
+% 2. Practical combinators & design patterns/idioms  (including virtualization)
+% 3. An interpreter runtime 
+% 4. A higher level language (micro Hoon, Moon)
+% 5. Bootstrapping Moon (parsers etc) 
+% 6. Types, doors, etc.
+% 7. The event loop
+% 8. A toy runtime
+% 9. Userspace loops upon loops, scrying
+% 10. Jets and hints
+% 11. Hoon proper, Jock
+
+\selectlanguage{USenglish}
+% \printbibliography
+\end{document}
