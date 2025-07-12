@@ -24,7 +24,7 @@
 
 \end{abstract}
 
-The first section of this chapter will introduce the basic \texttt{SKI} and \texttt{BCKW} combinator calculi and examine how they can represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
+The first section of this chapter will introduce the basic \textct{SKI} and \textct{BCKW} combinator calculi and examine how they can represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
 
 \section{Combinators in Computing}
 
@@ -41,19 +41,19 @@ Logicians early demonstrated the equivalence of these approaches, but particular
 One of the most fundamental objectives of combinatory logic is to eliminate variables.
 
 
-\subsection[The \texttt{SKI} calculus]{The SKI Calculus}
+\subsection{The \textct{SKI} calculus}
 
-Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \texttt{SKI} combinator calculus, which has three combinators:
-
-
-The identity combinator \texttt{I} is conventionally written \texttt{Ix = x}.  This simply means that it returns the result of its evaluation unchanged.
-
-\texttt{K}
-
-\texttt{S}
+Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \textct{SKI} combinator calculus, which has three combinators:
 
 
-The \texttt{SKI} system is Turing complete \citep{blah}, meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equivalent \texttt{SKI} expression and vice versa.  (cite church-turing thesis stuff)
+The identity combinator \textct{I} is conventionally written \textct{Ix = x}.  This simply means that it returns the result of its evaluation unchanged.
+
+\textct{K}
+
+\textct{S}
+
+
+The \textct{SKI} system is Turing complete \citep{blah}, meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equi\-valent \textct{SKI} expression and vice versa.  (cite church-turing thesis stuff)
 
 % https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
 
@@ -62,15 +62,15 @@ The \texttt{SKI} system is Turing complete \citep{blah}, meaning that any comput
 
 \subsection{The \textct{BCKW} calculus}
 
-\texttt{B}
+\textct{B}
 
 \textct{C}
 
 \textct{W}
 
-\texttt{U}
+\textct{U}
 
-\texttt{Y}
+\textct{Y}
 
 Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
 
@@ -83,9 +83,9 @@ Combinator calculi are generally considered too minimalist for practical program
 
 \section{Nock Opcodes as Combinator}
 
-\subsection{\texttt{I} Identity = Opcode 0}
+\subsection{\textct{I} Identity = Opcode 0}
 
-Nock's binary tree addressing is fully general and yields the identity combinator \texttt{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see.)
+Nock's binary tree addressing is fully general and yields the identity combinator \textct{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see.)
 
 Conceptually, we could write this in a hybrid form between combinators and Nock thus:
 
@@ -93,9 +93,9 @@ Conceptually, we could write this in a hybrid form between combinators and Nock 
   *[a I b] == [0 1]
 \end{lstlisting}
 
-\subsection{\texttt{K} Constant = Opcode 1}
+\subsection{\textct{K} Constant = Opcode 1}
 
-\subsection{\texttt{S} Substitution = Opcode 2}
+\subsection{\textct{S} Substitution = Opcode 2}
 
 \subsection{The Axiomatic Operators}
 
@@ -108,11 +108,11 @@ opcode 3, 4, 5, 10
 
 Several of the combinators we examined above are not present in Nock \emph{simpliciter}, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
 
-\subsection{\texttt{C} Reversal}
+\subsection{\textct{C} Reversal}
 
 C = S (S (K (S (K S) K)) S) (K K)
 
-In Nock, the reversal combinator \texttt{C} is almost free due to the binary tree nature of cells.
+In Nock, the reversal combinator \textct{C} is almost free due to the binary tree nature of cells.
 
 \begin{lstlisting}[style=listingcode]
   *[a C b] == *[7 [0 3] [[0 3] [0 2]]]
