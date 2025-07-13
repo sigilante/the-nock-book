@@ -23,7 +23,7 @@
 % \renewcommand{\textsc}[1]{\scalebox{1.25}{\oldtextsc{#1}}}
 \newcommand{\ssc}[1]{{\slantedsmallcapsfont\textsc{#1}}}
 % Special version of ss03 for Urbit Sans
-\newfontfamily\combfont{Urbit Sans Mono TT Bold}[Scale=MatchLowercase,RawFeature=+ss03]
+\newfontfamily\combfont{UrbitSansMonoTTNB-Bold.otf}[Scale=MatchLowercase,RawFeature=+ss03]
 \newcommand{\textct}[1]{{\combfont #1}}
 
 \usepackage{listings}
@@ -78,6 +78,23 @@
     basicstyle=\setmonofont\small,
     numbers=left, numberstyle=\tiny, stepnumber=5, firstnumber=1, numberfirstline=false,
     frame=tb,
+    tabsize=2,
+    columns=fixed,
+    showstringspaces=false,
+    showtabs=false,
+    showspaces=false,
+    keepspaces,
+    upquote=true,
+    breaklines=true,
+    breakatwhitespace=true,
+    commentstyle=\color{darkgray}\emph,
+    keywordstyle=\color{darkgray}\bfseries
+}
+\lstdefinestyle{listingcomb}{
+    language=Hoon,
+    basicstyle=\combfont\small,
+    % numbers=left, numberstyle=\tiny, stepnumber=5, firstnumber=1, numberfirstline=false,
+    % frame=tb,
     tabsize=2,
     columns=fixed,
     showstringspaces=false,

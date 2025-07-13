@@ -38,7 +38,7 @@ The pioneers of computing elaborated three complementary visions:
 
 Logicians early demonstrated the equivalence of these approaches, but particular formulations are still preferred for particular tasks.  The Turing machine is the most intuitive model of computation, and is often used to prove computability results.  The lambda calculus is the basis of many functional programming languages, such as Lisp, Scheme, and Haskell.  Combinatory logic is less widely used in practice, but has a long history in mathematical logic and type theory.  It is also the basis of Nock.
 
-One of the most fundamental objectives of combinatory logic is to eliminate variables.
+Before we get too far out over our skis, let's talk about what a combinator is.  At its simplest, a combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  In practice, we'll use different combinators to build up more complex functions, and we'll see informally how they can be combined to express any computable function.  We can even build combinators out of other combinators.  The objective of combinatory logic is to express all computation in terms of combinators alone, without the need for variables or named functions.
 
 
 \subsection{The \textct{SKI} calculus}
@@ -46,19 +46,51 @@ One of the most fundamental objectives of combinatory logic is to eliminate vari
 Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \textct{SKI} combinator calculus, which has three combinators:
 
 
-The identity combinator \textct{I} is conventionally written \textct{Ix = x}.  This simply means that it returns the result of its evaluation unchanged.
+The identity combinator \textct{I} is conventionally written \textct{Ix = x}.  This simply means that it returns its single argument unchanged.  There is little to say of this combinator at this point, but logicians have found that it frequently simplifies expressions.
 
-\textct{K}
+\begin{lstlisting}[style=listingcomb]
+I x
+x
+\end{lstlisting}
 
-\textct{S}
+The constant combinator \textct{K} is conventionally written \textct{Kxy = x}.  This means that it takes two arguments and returns the first, ignoring the second.  It is useful for building functions that always return a fixed value.
 
+\subsubsection{Questions}
+
+\begin{enumerate}
+  \item  What is the result of \textct{I x}?
+  \item  What is the result of \textct{I I x}?
+\end{enumerate}
+
+\begin{lstlisting}[style=listingcomb]
+K x y
+x
+\end{lstlisting}
+
+The substitution combinator \textct{S} is conventionally written \textct{Sxyz = xz(yz)}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the value \textct{z}, and also applies the function \textct{y} to the value \textct{z}, then applies the result of \textct{x z} to the result of \textct{y z}.  This combinator is more complex than the others, but it is very powerful, as it allows us to express function application and composition.
+
+\begin{lstlisting}[style=listingcomb]
+S x y z
+x z (y z)
+\end{lstlisting}
 
 The \textct{SKI} system is Turing complete \citep{blah}, meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equi\-valent \textct{SKI} expression and vice versa.  (cite church-turing thesis stuff)
+
+Combinators can be combined to form more complex expressions.  For example, the combinator \textct{S K K} is equivalent to the identity combinator \textct{I}:
+
+\begin{lstlisting}[style=listingcomb]
+S K K x
+K x (K x)
+x
+\end{lstlisting}
 
 % https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
 
 % https://en.wikipedia.org/wiki/B,_C,_K,_W_system
 % https://dkeenan.com/Lambda/index.htm
+
+% https://doisinkidney.com/posts/2020-10-17-ski.html
+% https://www.youtube.com/watch?v=GawiQQCn3bk
 
 \subsection{The \textct{BCKW} calculus}
 
@@ -74,8 +106,10 @@ The \textct{SKI} system is Turing complete \citep{blah}, meaning that any comput
 
 Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
 
-iota combinator
-% TODO: iota from "dotless i" head and "pi" tail
+MABE or whatever it is
+
+Chris Barker
+The iota combinator \textct{ι} can produce all the others, but in convoluted ways.
 
 % https://stackoverflow.com/questions/7368507/expressing-y-in-term-of-ski-combinators-in-javascript
 
