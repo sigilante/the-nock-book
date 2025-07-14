@@ -214,7 +214,7 @@ Nock's binary tree addressing is fully general and yields the identity combinato
 Conceptually, we could write this in a hybrid form between combinators and Nock thus:
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[x I] == *[x 0 1] == /[1 x] == x
+*[I x] == *[x 0 1] == /[1 x] == x
 \end{lstlisting}
 
 \noindent
@@ -227,7 +227,7 @@ Nock's homoiconicity, or the unification in representing code and data, renders 
 The constant combinator \textct{K} is present in Nock as opcode 1.  It takes two arguments, a subject and a formula, and returns the formula unchanged, ignoring the subject.  This is useful for building functions that always return a fixed value regardless of the input.
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[y K x] == *[y 1 x] == x
+*[K x y] == *[y 1 x] == x
 \end{lstlisting}
 
 \subsection{\textct{S} Substitution = Opcode 2}
@@ -235,7 +235,7 @@ The constant combinator \textct{K} is present in Nock as opcode 1.  It takes two
 The substitution combinator \textct{S} is supplied in Nock as opcode 2, the evaluation operator.  It takes three arguments, a subject and two formulas, and applies the first formula to the subject, then applies the second formula to the subject, and finally applies the result of the first application to the result of the second application.
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[z S x y] == *[z 2 x y] == *[*[z x] *[z y]]
+*[S x y z] == *[z 2 x y] == *[*[z x] *[z y]]
 \end{lstlisting}
 
 \subsection{The Axiomatic Operators}
