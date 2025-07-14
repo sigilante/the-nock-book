@@ -49,9 +49,8 @@ Computable functions can be expressed using minimal sets of combinators.  Many l
 
 The identity combinator \textct{I} is conventionally written \textct{Ix = x}.  This simply means that it returns its single argument unchanged.  There is little to say of this combinator at this point, but logicians have found that it frequently simplifies expressions.
 
-\begin{lstlisting}[style=listingcomb]
-I x
-x
+\begin{lstlisting}[style=listingcomb,frame=tb]
+I x == x
 \end{lstlisting}
 
 The constant combinator \textct{K} is conventionally written \textct{Kxy = x}.  This means that it takes two arguments and returns the first, ignoring the second.  It is useful for building functions that always return a fixed value.
@@ -63,27 +62,30 @@ The constant combinator \textct{K} is conventionally written \textct{Kxy = x}.  
   \item  What is the result of \textct{I I x}?
 \end{enumerate}
 
-\begin{lstlisting}[style=listingcomb]
-K x y
-x
+\begin{lstlisting}[style=listingcomb,frame=tb]
+K x y == x
 \end{lstlisting}
 
 The substitution combinator \textct{S} is conventionally written \textct{Sxyz = xz(yz)}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the value \textct{z}, and also applies the function \textct{y} to the value \textct{z}, then applies the result of \textct{x z} to the result of \textct{y z}.  This combinator is more complex than the others, but it is very powerful, as it allows us to express function application and composition.
 
-\begin{lstlisting}[style=listingcomb]
-S x y z
-x z (y z)
+\begin{lstlisting}[style=listingcomb,frame=tb]
+S x y z == x z (y z)
 \end{lstlisting}
 
-The \textct{SKI} system is Turing complete \citep{blah}, meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equi\-valent \textct{SKI} expression and vice versa.  (cite church-turing thesis stuff)
+The \textct{SKI} system is Turing complete (= $\mu$-recursive), meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equi\-valent \textct{SKI} expression and vice versa (\citet{Kleene1952}, Theorem XXX).\footnote{Four approaches to general-purpose computing were devised around the same time:  Moses Schönfinkel and Haskell Curry's combinator \textct{SKI} calculus (1920s); Alonzo Church's lambda calculus \textct{λC} (1936); Alan Turing's tape machine (1936); and Stephen Kleene's $\mu$-recursive functions (1936) building on Kurt G\"{o}del's primitive recursive (1931) and general recursive functions (1934).  These have been demonstrated to be equivalent to each other by means of the Church--Turing thesis:  ``Every effectively calculable function is a computable function.''  Various auxiliary proofs establish the isomorphic nature of these systematic approaches; however, a footnote much larger than the length of this book is warranted to address the relationships amongst these four formulations.  We simply take for granted their equivalence and move freely between representations as necessary.  Furthermore, other formulations, such as the structured program theorem for control flow graphs \citep{Bohm1966}, exist and merit future exploration.}
 
-Combinators can be combined to form more complex expressions.  For example, the combinator \textct{S K K} is equivalent to the identity combinator \textct{I}:
+Combinators can be combined to form more complex expressions.  For example, the combinator \textct{S K K} is equivalent to the identity combinator \textct{I}, which can be proven thus:
 
 \begin{lstlisting}[style=listingcomb]
-S K K x
-K x (K x)
-x
+S K K z ==      ; x -> K, y -> K, z -> z
+K z (K z) ==    ; K z -> z
+z
 \end{lstlisting}
+
+\noindent
+In such cases, combinators are applied from left to right by the first possible reduction.  This means that they will bottom out in a particular expression, which may be the argument (as with \textct{I x == x}).
+
+
 
 % https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
 
@@ -99,14 +101,23 @@ The \textct{BCKW} combinator calculus is an alternative to \textct{SKI}, with a 
 
 The composition combinator \textct{B} is conventionally written \textct{Bxyz = x(yz)}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{y} to the value \textct{z}, then applies the function \textct{x} to the result.
 
-\begin{lstlisting}[style=listingcomb]
-B x y z
-x (y z)
+\begin{lstlisting}[style=listingcomb,frame=tb]
+B x y z == x (y z)
 \end{lstlisting}
 
-% The constant combinator \textct{C} is conventionally written \textct{Cxyz = xzy}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z} and \textct{y}, effectively reversing the order of the last two arguments.
+The flip combinator \textct{C} is conventionally written \textct{Cxyz = xzy}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z} and \textct{y}, effectively reversing the order of the last two arguments.
 
-% The weakening combinator \textct{W} is conventionally written \textct{Wxy = xyy}.  This means that it takes two arguments: a function \textct{x} and a value \textct{y}.  It applies the function \textct{x} to the value \textct{y} twice.
+\begin{lstlisting}[style=listingcomb,frame=tb]
+C x y z == x z y
+\end{lstlisting}
+
+The join combinator \textct{W} is conventionally written \textct{Wxy = xyy}.  This means that it takes two arguments: a function \textct{x} and a value \textct{y}.  It applies the function \textct{x} to the value \textct{y} twice.
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+W x y == x y y
+\end{lstlisting}
+
+
 
 % The duplication combinator \textct{U} is conventionally written \textct{Uxyz = xzyz}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z}, \textct{y}, and \textct{z} again.  This combinator is less common, but can be useful in certain contexts.
 
@@ -139,7 +150,7 @@ Combinator calculi are generally considered too minimalist for practical program
 
 The Nock specification is produced in full in Listing~\ref{lst:nock-4k}.
 
-\begin{lstlisting}[style=listingcode,
+\begin{lstlisting}[style=listingblock,
                    caption={Nock 4K},
                    label={lst:nock-4k}]
 Nock 4K
@@ -191,46 +202,133 @@ nock(a)             *a
 *a                  *a
 \end{lstlisting}
 
+Nock has the following characteristics:
+
+(from handout)
+
+
 \subsection{\textct{I} Identity = Opcode 0}
 
-Nock's binary tree addressing is fully general and yields the identity combinator \textct{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see.)
+Nock's binary tree addressing is fully general and yields the identity combinator \textct{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see---this is unnecessary in the base case but needed to describe and navigate nouns.)
 
 Conceptually, we could write this in a hybrid form between combinators and Nock thus:
 
-\begin{lstlisting}[style=listingcode]
-  *[a I b] == [0 1]
+\begin{lstlisting}[style=listingcomb,frame=tb]
+*[x I] == *[x 0 1] == /[1 x] == x
 \end{lstlisting}
+
+\noindent
+In a sense, \textct{I} resolves immediately to \textct{[0 1]}, which is true but highlights a difference in terminology and argument structure.  Nock conceives of itself as applying a formula to a subject, which in combinator terms means the subject is one argument and the formula(s) is/are another.  However, the ``position'' of each will not be consistent, so you cannot simply map \textct{x} to ``formula''.
+
+Nock's homoiconicity, or the unification in representing code and data, renders it distinct in some ways.  The slot operator \textct{/} is more general than combinators typically are, as it assumes a structure to the input which is elided in combinatory logic.  This is a key difference between Nock and combinatory logic:  Nock is a language for manipulating structured data, while combinatory logic is a language for manipulating functions.  The slot operator \textct{/} is a way to access parts of structured data, which is not typically part of combinatory logic.  In our initial presentation, we are going to change the notation of subject and formula around to better match the conventions of the combinator definition for now.
 
 \subsection{\textct{K} Constant = Opcode 1}
 
+The constant combinator \textct{K} is present in Nock as opcode 1.  It takes two arguments, a subject and a formula, and returns the formula unchanged, ignoring the subject.  This is useful for building functions that always return a fixed value regardless of the input.
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+*[y K x] == *[y 1 x] == x
+\end{lstlisting}
+
 \subsection{\textct{S} Substitution = Opcode 2}
+
+The substitution combinator \textct{S} is supplied in Nock as opcode 2, the evaluation operator.  It takes three arguments, a subject and two formulas, and applies the first formula to the subject, then applies the second formula to the subject, and finally applies the result of the first application to the result of the second application.
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+*[z S x y] == *[z 2 x y] == *[*[z x] *[z y]]
+\end{lstlisting}
 
 \subsection{The Axiomatic Operators}
 
-Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.
+Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.  Nouns are binary trees addressed using the natural numbers (in binary, the path down the tree is given by \textct{0} for left and \textct{1} for right).
+
+Classical combinatory logic does not build in the natural numbers, but derives them as Church numerals.  Church numerals are a clever way to represent natural numbers as functions.  They are more naturally expressed in the lambda calculus, but can be converted from \textct{λC} to our preferred \textct{SKI} basis.  The Church numeral for zero is \textct{λf.λx.x}, which means that it takes a function \textct{f} and a value \textct{x}, and returns \textct{x} unchanged.  The Church numeral for one is \textct{λf.λx.f x}, which means that it takes a function \textct{f} and a value \textct{x}, and applies \textct{f} to \textct{x} once.  The Church numeral for two is \textct{λf.λx.f (f x)}, which means that it takes a function \textct{f} and a value \textct{x}, and applies \textct{f} to \textct{x} twice, and so forth.
+
+To build Church numerals in \textct{SKI}, we can use the following translations from \textct{λC} (presented without derivation from \textct{λC} to \textct{SKI}):
+
+\begin{lstlisting}[style=listingcomb]
+0 = K I
+1 = I
+2 = S (S (K S) K) I
+3 = S (S (K S) K) (S (S (K S) K) I)
+\end{lstlisting}
+
+\noindent
+To cast Church numerals into Nock terms, let's apply our expressions for \textct{I}, \textct{K}, and \textct{S}.  (We face our next challenge in translating from \textct{SKI} to Nock, which is that \textsc{SKI} evaluates from left to right, while Nock evaluates from right (``innermost'') to left (``outermost'').)  We also need to distinguish a Church numeral from the natural number to which it corresponds.
+
+\begin{lstlisting}[style=listingcomb]
+0 = K I => *[y K I] == *[y 1 [0 1]] == [0 1]
+1 = *[y I] == *[y 0 1] == /[1 y]
+2 = *[z S I] == *[z 2 [0 1] [0 1]] == *[*[z [0 1]] *[z [0 1]]]
+3 = *[z S (S (K S) K) I] == *[z 2 [2 [1 [0 3] [0 2]] [0 1]]]
+   == *[*[z [2 [1 [0 3] [0 2]]]] *[z [0 1]]]
+   == *[*[*[z 2 [1 [0 3] [0 2]]] *[z 1 [0 1]]] *[z [0 1
+]]]
+   == *[*[*[*[z 2 [0 3]] *[z 2 [0 2]]] *[z 1 [0 1]]] *[z [0 1]]]
+   == *[*[*[*[*[z 2 [0 3]] *[z 2 [0 2]]] *[*[z 1 [0 1]]]] *[z [0 1]]]
+   == *[*[*[*[*[z 2 [0 3]] *[z 2 [0 2]]] *[*[z 1 [0 1]]]] *[z [0 1]]
+\end{lstlisting}
+
+A general-purpose increment operator can be built in \textsc{SKI} as well.  Let's call this increment operator \textct{A} (classically written \textct{Succ}) and derive it as follows:
+
+% S(S(KS)K)(S(KK)I)
+\begin{lstlisting}[style=listingcode]
+::  S(S(KS)K)(S(KK)I)
+\end{lstlisting}
+
+\noindent
+Very awkward!  Fortunately we don't need to continue down this road.  We don't actually need Church numerals for Nock because Nock has built-in arithmetic, but they are a useful exercise for understanding how to build more complex combinators.
 
 opcode 3, 4, 5, 10
 
+% https://web.archive.org/web/20070716223000/https://homepages.nyu.edu/~cb125/Lambda/ski.html
 
 \section{Idioms \& Design Patterns}
 
 Several of the combinators we examined above are not present in Nock \emph{simpliciter}, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
 
-\subsection{\textct{C} Reversal}
+\subsection{\textct{C} Flip Operator}
 
+\begin{lstlisting}[style=listingcomb,frame=tb]
 C = S (S (K (S (K S) K)) S) (K K)
-
-In Nock, the reversal combinator \textct{C} is almost free due to the binary tree nature of cells.
-
-\begin{lstlisting}[style=listingcode]
-  *[a C b] == *[7 [0 3] [[0 3] [0 2]]]
-  *[a C b] == *[[0 7] [0 6]]
 \end{lstlisting}
 
+While we can formulate the flip operator \textct{C} in terms of the Nock translation of \textct{S} and \textct{K}, it is more practical to use opcode 0.  This is almost free due to the binary tree nature of cells.
 
-Recursion we get for free with opcode 0.
+\begin{lstlisting}[style=listingcode]
+*[a C b] == *[[0 3] [0 2]]
+\end{lstlisting}
 
-$\mu$-recursive functions
+\section{Nock as Generally Computable}
+
+While it is beyond our scope to prove the equivalence of the four formulations of general computability, we can briefly demonstrate that Nock does satisfy the requirements of each.
+
+\textct{SKI} and \textct{λC} completeness have been established above.  Turing machine equivalence is established by the fact that we can build a universal Turing machine in Nock.  Per \citet*{Hopcroft1979}, p.~148, a universal Turing machine has the following components:
+
+\begin{itemize}
+  \item  A finite, non-empty set of tape alphabet symbols, including a blank symbol.
+  \item  A finite, non-empty set of states, including a start state and one or more halting states.
+  \item  A transition function that, given the current state and the symbol being read, specifies the next state, the symbol to write, and the direction to move (left or right).
+\end{itemize}
+
+\noindent
+Nock as operator over nouns satisfies these requirements with the natural numbers (including crash \textct{[0 0]} as blank) and cells to constitute nouns, while the transition function is represented by the evaluation rules of Nock itself.
+
+Finally, Nock is generally recursive (or $\mu$-recursive) because it has the necessary building blocks (\citet{Paulsen1995}; \citet{Boolos2002}, ``6.2 Minimization'', pp.~70–71):
+
+\begin{itemize}
+  \item  Constant function including zero (opcode 1)
+  \item  Increment or successor function (opcode 4)
+  \item  Parameter selection or variable access (opcodes 0 and 9 along with opcodes 7 and 8)
+  \item  Function composition or program concatenation (opcodes 7 and 8)
+  \item  Recursion or looping (opcode 0 with, e.g., opcodes 3, 5, and 6)
+\end{itemize}
+
+\noindent
+Thus Nock can express all $\mu$-recursive functions.
+
+% (We refer to the basic requirements for Turing completeness as exemplified in the [*μ*-recursive functions](https://en.wikipedia.org/wiki/General_recursive_function) which amount to constant, increment, variable access, program concatenation, looping per [Raphael2012](https://cs.stackexchange.com/questions/991/are-there-minimum-criteria-for-a-programming-language-being-turing-complete).)
+% Paulsen1995
 
 
 \section{Virtualization}
