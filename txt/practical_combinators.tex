@@ -40,6 +40,7 @@ Logicians early demonstrated the equivalence of these approaches, but particular
 
 Before we get too far out over our skis, let's talk about what a combinator is.  At its simplest, a combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  In practice, we'll use different combinators to build up more complex functions, and we'll see informally how they can be combined to express any computable function.  We can even build combinators out of other combinators.  The objective of combinatory logic is to express all computation in terms of combinators alone, without the need for variables or named functions.
 
+This first section will introduce some elemental and compound combinators and make the case that they circumscribe ``computing'' as a concept.
 
 \subsection{The \textct{SKI} calculus}
 
@@ -94,19 +95,38 @@ x
 
 \subsection{The \textct{BCKW} calculus}
 
-\textct{B}
+The \textct{BCKW} combinator calculus is an alternative to \textct{SKI}, with a different set of primitive combinators.  It has four combinators:
 
-\textct{C}
+The composition combinator \textct{B} is conventionally written \textct{Bxyz = x(yz)}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{y} to the value \textct{z}, then applies the function \textct{x} to the result.
 
-\textct{W}
+\begin{lstlisting}[style=listingcomb]
+B x y z
+x (y z)
+\end{lstlisting}
+
+% The constant combinator \textct{C} is conventionally written \textct{Cxyz = xzy}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z} and \textct{y}, effectively reversing the order of the last two arguments.
+
+% The weakening combinator \textct{W} is conventionally written \textct{Wxy = xyy}.  This means that it takes two arguments: a function \textct{x} and a value \textct{y}.  It applies the function \textct{x} to the value \textct{y} twice.
+
+% The duplication combinator \textct{U} is conventionally written \textct{Uxyz = xzyz}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z}, \textct{y}, and \textct{z} again.  This combinator is less common, but can be useful in certain contexts.
+
+The \textsc{SKI} and \textsc{BCKW} systems are equivalent, meaning that any expression in one system can be translated into an equivalent expression in the other system.  For example, the identity combinator \textct{I} can be expressed in \textsc{BCKW} as:
+
+\begin{lstlisting}[style=listingcomb]
+I = W K
+
+\end{lstlisting}
+
 
 \textct{U}
 
 \textct{Y}
 
+\begin{lstlisting}[style=listingcomb]
 Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
+\end{lstlisting}
 
-MABE or whatever it is
+\textct{MABT} or whatever it is
 
 Chris Barker
 The iota combinator \textct{ι} can produce all the others, but in convoluted ways.
@@ -116,6 +136,60 @@ The iota combinator \textct{ι} can produce all the others, but in convoluted wa
 Combinator calculi are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  Thus it is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
 
 \section{Nock Opcodes as Combinator}
+
+The Nock specification is produced in full in Listing~\ref{lst:nock-4k}.
+
+\begin{lstlisting}[style=listingcode,
+                   caption={Nock 4K},
+                   label={lst:nock-4k}]
+Nock 4K
+
+A noun is an atom or a cell. An atom is a natural number. A cell is an ordered pair of nouns.
+
+Reduce by the first matching pattern; variables match any noun.
+
+nock(a)             *a
+[a b c]             [a [b c]]
+
+?[a b]              0
+?a                  1
++[a b]              +[a b]
++a                  1 + a
+=[a a]              0
+=[a b]              1
+
+/[1 a]              a
+/[2 a b]            a
+/[3 a b]            b
+/[(a + a) b]        /[2 /[a b]]
+/[(a + a + 1) b]    /[3 /[a b]]
+/a                  /a
+
+#[1 a b]            a
+#[(a + a) b c]      #[a [b /[(a + a + 1) c]] c]
+#[(a + a + 1) b c]  #[a [/[(a + a) c] b] c]
+#a                  #a
+
+*[a [b c] d]        [*[a b c] *[a d]]
+
+*[a 0 b]            /[b a]
+*[a 1 b]            b
+*[a 2 b c]          *[*[a b] *[a c]]
+*[a 3 b]            ?*[a b]
+*[a 4 b]            +*[a b]
+*[a 5 b c]          =[*[a b] *[a c]]
+
+*[a 6 b c d]        *[a *[[c d] 0 *[[2 3] 0 *[a 4 4 b]]]]
+*[a 7 b c]          *[*[a b] c]
+*[a 8 b c]          *[[*[a b] a] c]
+*[a 9 b c]          *[*[a c] 2 [0 1] 0 b]
+*[a 10 [b c] d]     #[b *[a c] *[a d]]
+
+*[a 11 [b c] d]     *[[*[a c] *[a d]] 0 3]
+*[a 11 b c]         *[a c]
+
+*a                  *a
+\end{lstlisting}
 
 \subsection{\textct{I} Identity = Opcode 0}
 
