@@ -6,6 +6,20 @@
 % \usepackage{bibentry} % For bibliography
 \addbibresource{main.bib}
 
+\usepackage{fontspec}
+\setsansfont{Helvetica}
+\newfontfamily\gothicfont{Textura Libera Tenuis}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.10}
+\usetikzlibrary{shapes.geometric,arrows,fit,matrix,positioning}
+\tikzset
+{
+    treenode/.style = {circle, draw=black, align=center, minimum size=1cm},
+    subtree/.style  = {circle, draw=darkgray, dashed, text=darkgray, align=center, minimum size=1cm}
+}
+
 % Define author commands
 \newcommand{\authorname}{N.\ E.\ Davis}
 \newcommand{\authorpatp}{\patp{lagrev-nocfep}}
@@ -19,8 +33,8 @@
 \newcommand{\chaptertitle}{}
 
 %% MANUSCRIPT
-\title{NOCK \& THE ART OF \\ SOLID-STATE COMPUTING\\An Enquiry into the Virtual}
-\author{\authorname \\ \authorpatp}
+\title{\fontsize{36pt}{36pt}\gothicfont NOCKONOMICON}
+\author{\fontsize{24pt}{24pt}\gothicfont\authorname}
 \date{}
 
 \begin{document}

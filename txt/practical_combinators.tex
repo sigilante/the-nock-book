@@ -148,6 +148,8 @@ Combinator calculi are generally considered too minimalist for practical program
 
 \section{Nock Opcodes as Combinator}
 
+At this point, we must engage Nock as a specification for computing.  Nock defines a number of opcodes (``operation codes'') which span a range of common functional behaviors, including those we have seen in the basic combinators.  Nock represents all data as a noun, which is either an atom (a natural number, which may be thought of a G\"{o}del number or raw data as bytes) or a cell (an ordered pair of nouns, with a head and a tail).  Nock opcodes operate with at least two arguments:  a ``subject'' which defines the operating environment, more or less, and a ``formula'' or expression which in conjunction with the opcode describes the action to take.  These may be arbitrarily composed to build programs.
+
 The Nock specification is produced in full in Listing~\ref{lst:nock-4k}.
 
 \begin{lstlisting}[style=listingblock,
@@ -155,7 +157,8 @@ The Nock specification is produced in full in Listing~\ref{lst:nock-4k}.
                    label={lst:nock-4k}]
 Nock 4K
 
-A noun is an atom or a cell. An atom is a natural number. A cell is an ordered pair of nouns.
+A noun is an atom or a cell. An atom is a natural number. A cell is an
+ordered pair of nouns.
 
 Reduce by the first matching pattern; variables match any noun.
 
@@ -202,45 +205,209 @@ nock(a)             *a
 *a                  *a
 \end{lstlisting}
 
-Nock has the following characteristics:
+The beginning of this specification is concerned with defining a noun, which is either an atom (a natural number) or a cell (an ordered pair of nouns).  Several opcodes 
 
-(from handout)
+Nouns are binary trees addressed using the natural numbers (in binary, the path down the tree is given by \textct{0} for left and \textct{1} for right) (see Figures~\ref{fig:tree-numeric} and~\ref{fig:tree-binary}).
 
+\begin{figure}[hbt!]
+  \centering
+  \begin{tikzpicture}[
+    ->, >=stealth,
+    level 1/.style={sibling distance=8cm, level distance=1.5cm},
+    level 2/.style={sibling distance=4cm, level distance=1.5cm},
+    level 3/.style={sibling distance=2cm, level distance=1.5cm},
+    level 4/.style={sibling distance=1cm, level distance=1.5cm},
+    scale=0.6, transform shape,
+    subtree/.style={circle, draw, fill=white, minimum size=1cm},
+    treenode/.style={circle, draw, fill=white, minimum size=1cm}
+  ]
+    \node [subtree] {\large \textct{1}}
+    child {
+      node [subtree] {\large \textct{2}}
+      child {
+        node [subtree] {\large \textct{4}}
+        child {
+          node [subtree] {\large \textct{8}}
+        }
+        child {
+          node [subtree] {\large \textct{9}}
+        }
+      }
+      child {
+        node [subtree] {\large \textct{5}}
+        child {
+          node [subtree] {\large \textct{10}}
+        }
+        child {
+          node [subtree] {\large \textct{11}}
+        }
+      }
+    }
+    child {
+      node [subtree] {\large \textct{3}}
+      child {
+        node [subtree] {\large \textct{6}}
+        child {
+          node [subtree] {\large \textct{12}}
+        }
+        child {
+          node [subtree] {\large \textct{13}}
+        }
+      }
+      child {
+        node [subtree] {\large \textct{7}}
+        child {
+          node [subtree] {\large \textct{14}}
+        }
+        child {
+          node [subtree] {\large \textct{15}}
+        }
+      }
+    };
+  \end{tikzpicture}
+  \caption{A binary tree with node addresses. \label{fig:tree-numeric}}
+\end{figure}
+
+\begin{figure}[hbt!]
+  \centering
+  \begin{tikzpicture}[
+    ->, >=stealth,
+    level 1/.style={sibling distance=8cm, level distance=1.5cm},
+    level 2/.style={sibling distance=4cm, level distance=1.5cm},
+    level 3/.style={sibling distance=2cm, level distance=1.5cm},
+    level 4/.style={sibling distance=1cm, level distance=1.5cm},
+    scale=0.6, transform shape,
+    subtree/.style={circle, draw, fill=white, minimum size=1cm},
+    treenode/.style={circle, draw, fill=white, minimum size=1cm}
+  ]
+    \node [subtree] {\large \textct{1}}
+    child {
+      node [subtree] {\large \textct{10}}
+      child {
+        node [subtree] {\large \textct{100}}
+        child {
+          node [subtree] {\large \textct{1000}}
+        }
+        child {
+          node [subtree] {\large \textct{1001}}
+        }
+      }
+      child {
+        node [subtree] {\large \textct{101}}
+        child {
+          node [subtree] {\large \textct{1010}}
+        }
+        child {
+          node [subtree] {\large \textct{1011}}
+        }
+      }
+    }
+    child {
+      node [subtree] {\large \textct{11}}
+      child {
+        node [subtree] {\large \textct{110}}
+        child {
+          node [subtree] {\large \textct{1100}}
+        }
+        child {
+          node [subtree] {\large \textct{1101}}
+        }
+      }
+      child {
+        node [subtree] {\large \textct{111}}
+        child {
+          node [subtree] {\large \textct{1110}}
+        }
+        child {
+          node [subtree] {\large \textct{1111}}
+        }
+      }
+    };
+  \end{tikzpicture}
+  \caption{A binary tree with node addresses in binary indicating path. \label{fig:tree-binary}}
+\end{figure}
+
+
+A Nock system has the following characteristics:
+
+\begin{enumerate}
+  \item  Turing-complete:  implements minimum requirements of $\mu$-recursive functions.  (This will be demonstrated below.)
+  \item  Functional:  uniquely maps \textct{[subject formula]} to \textct{product}.  (This is a direct consequence of the definitions above.  Nock evaluation is pure and deterministic.)
+  \item  Subject-oriented:  subject entirely determines scope for formula.  (This is a direct consequence of the definitions above.)
+  \item  Homoiconic:  uses same representation for data and control.  (No distinction is made between code and data, in that both are nouns.  Not all valid data is valid code, of course.)
+  \item  Untyped:  only knows about nouns.  (While basic arithmetic is involved for cell addressing, no more algebraic machinery is imported.)
+  \item  Solid-state:  maintains no transient state in interpreter.  (Each Nock evaluation is completely defined by its subject and formula.  Noun `mutability' is an apparent result of iterated evaluations of expressions on a subject.)
+\end{enumerate}
 
 \subsection{\textct{I} Identity = Opcode 0}
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+I x → x
+\end{lstlisting}
 
 Nock's binary tree addressing is fully general and yields the identity combinator \textct{I} as a special case.  (The cost, of course, is dragging in some machinery for basic arithmetic, as we will see---this is unnecessary in the base case but needed to describe and navigate nouns.)
 
 Conceptually, we could write this in a hybrid form between combinators and Nock thus:
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[I x] == *[x 0 1] == /[1 x] == x
+I x → *[x 0 1] ==
+      /[1 x] ==
+      x
 \end{lstlisting}
 
 \noindent
 In a sense, \textct{I} resolves immediately to \textct{[0 1]}, which is true but highlights a difference in terminology and argument structure.  Nock conceives of itself as applying a formula to a subject, which in combinator terms means the subject is one argument and the formula(s) is/are another.  However, the ``position'' of each will not be consistent, so you cannot simply map \textct{x} to ``formula''.
 
-Nock's homoiconicity, or the unification in representing code and data, renders it distinct in some ways.  The slot operator \textct{/} is more general than combinators typically are, as it assumes a structure to the input which is elided in combinatory logic.  This is a key difference between Nock and combinatory logic:  Nock is a language for manipulating structured data, while combinatory logic is a language for manipulating functions.  The slot operator \textct{/} is a way to access parts of structured data, which is not typically part of combinatory logic.  In our initial presentation, we are going to change the notation of subject and formula around to better match the conventions of the combinator definition for now.
+Nock's homoiconicity, or the unification in representing code and data, renders it distinct in some ways.  The slot operator \textct{/} fas is more general than combinators typically are, as it assumes a structure to the input which is elided in combinatory logic.  This is a key difference between Nock and combinatory logic:  Nock is a language for manipulating structured data, while combinatory logic is a language for manipulating functions.  The slot operator \textct{/} fas is a way to access parts of structured data, which is not typically part of combinatory logic.  In our initial presentation, we are going to change the notation of subject and formula around to better match the conventions of the combinator definition for now.
 
 \subsection{\textct{K} Constant = Opcode 1}
 
-The constant combinator \textct{K} is present in Nock as opcode 1.  It takes two arguments, a subject and a formula, and returns the formula unchanged, ignoring the subject.  This is useful for building functions that always return a fixed value regardless of the input.
-
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[K x y] == *[y 1 x] == x
+K x y → x
 \end{lstlisting}
 
+The constant combinator \textct{K} is implemented in Nock as opcode 1.  It takes two arguments, a subject and a formula, and returns the formula unchanged, ignoring the subject.  This is useful for building functions that always return a fixed value regardless of the input.
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+K x y → *[y 1 x] ==
+        x
+\end{lstlisting}
+
+\noindent
+Note that we had to swap the order of \textct{x} and \textct{y} to match Nock's argument order.  This is a common theme when translating between formal combinatory logic and Nock:  the order of arguments may differ, so care must be taken to ensure that the correct values are being passed to the correct positions.
+
 \subsection{\textct{S} Substitution = Opcode 2}
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+S x y z → x z (y z)
+\end{lstlisting}
 
 The substitution combinator \textct{S} is supplied in Nock as opcode 2, the evaluation operator.  It takes three arguments, a subject and two formulas, and applies the first formula to the subject, then applies the second formula to the subject, and finally applies the result of the first application to the result of the second application.
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
-*[S x y z] == *[z 2 x y] == *[*[z x] *[z y]]
+S x y z → *[z 2 x y] ==
+          *[*[z x] *[z y]]
 \end{lstlisting}
 
 \subsection{The Axiomatic Operators}
 
-Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.  Nouns are binary trees addressed using the natural numbers (in binary, the path down the tree is given by \textct{0} for left and \textct{1} for right).
+Because of Nock's cellular nature as a binary tree, we need the ability to access and manipulate nouns.
+
+The noun equality operator \textct{=} tis is used to implement to opcode 5, which takes two arguments and returns 0 if they are equal (when evaluated against the subject) and 1 if they are not.
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+:: TODO check
+=[x y] → *[z 5 x y] ==
+         =[*[z x] *[z y]]
+\end{lstlisting}
+
+Nock supplies this as a primitive operation, but it can be built out of combinators as well if we supply alternative conventions for boolean values.  In \textct{SKI}, we represent true as \textct{K} (i.e., the first of two arguments) and false as \textct{SK} (the second of two arguments).
+
+
+
+
+
+\subsubsection{Church Numerals in Nock}
 
 Classical combinatory logic does not build in the natural numbers, but derives them as Church numerals.  Church numerals are a clever way to represent natural numbers as functions.  They are more naturally expressed in the lambda calculus, but can be converted from \textct{λC} to our preferred \textct{SKI} basis.  The Church numeral for zero is \textct{λf.λx.x}, which means that it takes a function \textct{f} and a value \textct{x}, and returns \textct{x} unchanged.  The Church numeral for one is \textct{λf.λx.f x}, which means that it takes a function \textct{f} and a value \textct{x}, and applies \textct{f} to \textct{x} once.  The Church numeral for two is \textct{λf.λx.f (f x)}, which means that it takes a function \textct{f} and a value \textct{x}, and applies \textct{f} to \textct{x} twice, and so forth.
 
@@ -279,25 +446,129 @@ A general-purpose increment operator can be built in \textsc{SKI} as well.  Let'
 \noindent
 Very awkward!  Fortunately we don't need to continue down this road.  We don't actually need Church numerals for Nock because Nock has built-in arithmetic, but they are a useful exercise for understanding how to build more complex combinators.
 
-opcode 3, 4, 5, 10
+\subsubsection{Increment, Opcode 4}
+
+Given that the natural numbers are built into Nock via both atoms and the tree addressing scheme, we can change an atom to its successor by applying the increment operator \textct{+} (opcode 4).  This takes a single argument, an atom, and returns the next natural number.\footnote{This will always succeed for an atom, since every natural number has a successor.  If the argument is a cell, it will fail, as \textct{+[a b]} spins.}
+
+
+% (Implicitly, multiplication has also been smuggled into the Nock specification via tree addressing---\textct{()}---but no primitive operator implements it.)
+
+\subsubsection{Structure Checks, Opcodes 3 and 5}
+
+Two salient structure checks are provided in Nock:  a cell check, which results in \textct{TRUE}/\textct{0} if the argument is a cell and \textct{FALSE}/\textct{1} otherwise (only an atom); and an equality check, which results in \textct{TRUE}/\textct{0} if the two arguments are equal and \textct{FALSE}/\textct{1} otherwise.  These are implemented as opcodes 3 and 5, respectively.
+
+There are not equivalent combinators in the \textct{SKI} calculus for these checks since \textct{SKI} does not know about any structure for its arguments.  %TODO true?
+
+(This pair of opcodes implies the possible desirability of a general-purpose structural check in Nock, which would match the overall binary tree layout of two nouns but not check the actual values of the atom leafs.  Thus \textct{[0 1 2]} would match \textct{[0 1 2]} and \textct{[0 1 3]}, but not \textct{[[0 1] 2 3]} or \textct{[0 1]}.)
 
 % https://web.archive.org/web/20070716223000/https://homepages.nyu.edu/~cb125/Lambda/ski.html
 
+\subsection{Pythagoras and Peirce in Nock}
+
+\begin{quote}
+  \emph{Die ganzen Zahlen hat der liebe Gott gemacht, alles andere ist Menschenwerk.} \\
+  The dear Lord created the natural numbers; all else is the work of Man. \\
+  (Leopold Kronecker, 1886 lecture to Berlin Naturalists' Assembly)
+\end{quote}
+
+\begin{quote}
+  The first is that whose being is simply in itself, not referring to anything nor lying behind anything. The second is that which is what it is by force of something to which it is second. The third is that which is what it is owing to things between which it mediates and which it brings into relation to each other. \\
+  (Charles Sanders Peirce, \emph{Collected Papers} 2.356)
+\end{quote}
+
+To take an esoteric aside on the nature of Nock as a computational platform, we may consider the Pythagorean relationship of the axioms and the opcodes.\footnote{In a general way, \patp{barpub-tarber} and his Conk formulation as the field of possible Nocks (developed 2013--2017, republished 2025) parallel this analysis at the strict level of the opcodes.}  Kronecker's quip was a bit of hyperbole leveled at Georg Cantor's number mysticism, but it nevertheless highlights the spartan utility of atoms and addressing in Nock.
+
+The natural numbers are conventionally taken as a constructive ordered set of 0 and its successors along with addition, multiplication, and division (either floor division or division with remainder).  (There is no additive inverse or subtraction in the natural numbers, since subtraction may result in a value that is not a natural number.)  Nock dispenses with multiplication and division, relying strictly on addition in its axiomatic definitions.  Nock 0 as an addressing system already in fact carries within it the seeds of the axiomatic operators \textct{?} and \textct{+}, because the addressed binary tree must know if a leaf is a cell or atom and be able to calculate its head and tail via use of the successor function \textct{+}.
+
+Furthermore, there is a sense in which computing is deeply semiotic.  Semiotics is the philosophy of symbols and how they interrelate.  (At the outside, you end up with language, culture, and thought itself as mutually recursive tangle of sign references, but we don't need to go that far here.\footnote{See the works of Saussure, Peirce, Eco, and Derrida, if you are interested in a great rabbit hole.})  Here we simply note that any noun always stands in relation to (at least) two possibilities:  being a subject or being a formula.  Of course, not every noun can be evaluated as a valid formula, but any noun can be utilized as a subject for appropriate formulas.  Thus a noun is a member of an evaluation system:  its purpose is to participate in a computation.\footnote{Another stance of nouns to consider is with respect to the field of possible binary trees, that is, the field of possible nouns.  We briefly note that the first possible formula is the crash or void, \textct{[0 0]}, and the second possible formula is the identity, \textct{[0 1]}.}
+
+Peirce's triadic semiotics gives us a way to conceive of nouns as embedded symbols.  No noun is an island:  it may be considered by itself, but it always bears a relationship to other nouns, even possible nouns.  So it has both an identity and a contrast.  Hearkening back to its role as a subject or possibly as a formula, a noun naturally carries Peirce's thirdness:  it must stand in relation to other nouns.
+
+Numbers as first explicated by Pythagoras remain magical when taken sufficiently seriously.  Nock catches one more facet of their light.
+
 \section{Idioms \& Design Patterns}
 
-Several of the combinators we examined above are not present in Nock \emph{simpliciter}, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).
+Several of the combinators we examined above are not present in Nock \emph{simpliciter}, but we can build them out of the other pieces.  There are also common idioms which are baked in as ``compound opcodes'' (such as conditional branching, opcode 6).\footnote{This first set of combinators derives from the original Schoenfinkel--Curry work \citep{Curry1930}.}  Let's look at a few common combinators and then extend Nock with its standard opcdoes.
+
+We can approach the construction of equivalent combinator expressions in Nock in two ways.  The first is to start with the combinator definition in terms of \textct{SKI} and then substitute our Nock expressions for \textct{S}, \textct{K}, and \textct{I}.  The second is to construct the simplest Nock expression, which utilizes the additional affordances of Nock (primarily slot addressing with opcode 0) to achieve the same effect.
 
 \subsection{\textct{C} Flip Operator}
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+C x y z == x z y
+\end{lstlisting}
+
+The flip operator \textct{C} is a combinator that takes a pair of arguments and reverses their order.  It is useful for building functions that take two arguments and apply them in a different order than they are given.  In \textct{SKI} terms, we can express this as follows:
 
 \begin{lstlisting}[style=listingcomb,frame=tb]
 C = S (S (K (S (K S) K)) S) (K K)
 \end{lstlisting}
 
-While we can formulate the flip operator \textct{C} in terms of the Nock translation of \textct{S} and \textct{K}, it is more practical to use opcode 0.  This is almost free due to the binary tree nature of cells.
+While we can formulate the flip operator \textct{C} in terms of the Nock translation of \textct{S} and \textct{K}, it is far more practical to use opcode 0.  This is almost free due to the binary tree nature of cells.  In Nock, we express this as follows:
 
 \begin{lstlisting}[style=listingcode]
-*[a C b] == *[[0 3] [0 2]]
+C x y z == x z y →
+           [*[*[y z] [0 3] x] *[*[y z] [0 2] x]]
 \end{lstlisting}
+% > [.*(.*([40 42] [0 3]) [4 0 1]) .*(.*([40 42] [0 2]) [4 0 1])]
+% [43 41]
+
+\noindent
+\textct{C} simply rearranges the order of two nouns, which can be useful in managing conditional branches or modifying function argument order.\footnote{You can see here how using opcode 0 substantially simplifies the Nock equivalent expression versus the \textct{SKI} definition.}  (For example, there is an operation called \emph{currying} we'll see later which takes a function of two arguments and returns a function of one argument that applies the first argument to the second.  If you wanted to bind the second argument, however, you could use something like \textct{C} to flip the order of the arguments when you curry.)
+
+\subsection{\textct{B} Composition Operator}
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+B x y z == x (y z)
+\end{lstlisting}
+
+The composition operator \textct{B} is a combinator that takes three arguments:  a function and two values.  It applies the second value to the third value, then applies the function to the result.  In \textct{SKI} terms, we can express this as follows:
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+B = S (K S) K
+\end{lstlisting}
+
+The more straightforward Nock expression for \textct{B} in terms of \textct{S} and \textct{K} would be:
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+B x y z →
+        *[z 7 x y] ==
+        *[*[z y] x]
+\end{lstlisting}
+
+\noindent
+This is very similar to opcode 7, modulo rearranging the argument order.
+
+\textct{B} is useful for building functions that apply a function to the result of another function, allowing for more complex compositions of functions.
+
+\subsection{\textct{W} Join Operator}
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+W x y == x y y
+\end{lstlisting}
+
+The join operator \textct{W} is a combinator that takes two arguments:  a function and a value.  It applies the function to the value twice; that is, it duplicates its second argument and applies it twice to the first.  In \textct{SKI} terms, we can express this as follows:
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+W = S S (S K)
+\end{lstlisting}
+
+The more straightforward Nock expression for \textct{W} in terms of \textct{S} and \textct{K} would be:
+
+\begin{lstlisting}[style=listingcomb,frame=tb]
+W x y →
+      *[*[y x] y]
+      *[y *[y x]]
+\end{lstlisting}
+[.*(42 [4 0 1]) 42]
+
+
+\noindent
+This is very similar to opcode 8, modulo rearranging the argument order.  Opcode 8 also has a built-in continuation to apply the result to a third argument.
+
+\subsection{\textct{U} Duplication Operator}
+
+\footnote{The second set of combinators follows work done by \citet{Smullyan1985} in his marvelous \emph{To Mock a Mockingbird}.}
 
 \section{Nock as Generally Computable}
 
@@ -331,7 +602,7 @@ Thus Nock can express all $\mu$-recursive functions.
 % Paulsen1995
 
 
-\section{Virtualization}
+\section{A Stateful Nock Kernel}
 
 Nock is a crash-only pure language, which means at the base level it can only succeed and yield a new noun:  no side effects, no exceptions, no state.  Like a castaway on a desert island, we must build everything we need from raw materials at hand.
 
@@ -354,3 +625,31 @@ The magic formula at the beating heart of a practical Nock operating system is s
 
 \noindent
 That is, apply the Nock formula against a subject pair consisting of the current state and the head of the list of events to process.
+
+% https://doisinkidney.com/posts/2020-10-17-ski.html
+% https://en.wikipedia.org/wiki/SKI_combinator_calculus
+% https://github.com/urbit/examples/blob/master/wip/lib/nock.hoon
+% https://en.wikipedia.org/wiki/Turing_machine_examples
+
+\section{Virtualization}
+
+TODO derivation of Nock \textct{+mock}
+
+What could we want in a virtualized Nock environment?
+
+Traditionally, opcode 12 has been used to permit the hyper-Turing ``scry'' operator, which allows you to look up a bound persistent value in a referentially transparent way.  This is especially useful when a necessary value is not available in the current subject or needs to be supplied by the runtime (such as a system date or entropy).
+
+We can also implement the combinators as extended Nock opcodes, aiding us in building more complex expressions from our higher-level language compiler when we get there.
+
+\begin{enumerate}
+  \item[13.]  \textct{B} composition operator
+  \item[14.]  \textct{C} flip operator
+  \item[15.]  \textct{W} join operator
+  \item[16.]  \textct{U} duplication operator
+  \item[17.]  \textct{XXX}
+\end{enumerate}
+
+https://web.archive.org/web/20070716223000/https://homepages.nyu.edu/~cb125/Lambda/ski.html
+https://komiamiko.me/math/ordinals/2020/06/21/ski-numerals.html
+https://www.angelfire.com/tx4/cus/combinator/birds.html
+https://www.sciencedirect.com/science/article/abs/pii/S0049237X99800172

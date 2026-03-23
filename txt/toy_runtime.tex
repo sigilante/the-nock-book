@@ -1,0 +1,69 @@
+\renewcommand{\chaptertitle}{A Virtual Machine Runtime}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  50–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\urbitfont The Nock Book}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+\begin{abstract}
+
+\end{abstract}
+
+To date, we have run Nock either by hand or using a simple interpreter.  While this suffices for relatively small programs, our objective of building a Nock computer requires an ``operating function'', or persistent event loop.  This chapter introduces the considerations of running Nock continuously and reactively as well as how to maintain state and respond to opcode 11 hints.
+
+\section{The Event Loop}
+
+A single Nock expression as a subject--formula pair accepts two nouns and yields a new noun.  We can think of this new noun as the total state of a program or an operating system, feeding it into the next expression as the subject for a new formula to evaluate against.  This preserves the determinism and legibility of Nock while allowing for complex state transitions.
+
+\subsection{A Simple State Machine}
+
+A state machine is a mathematical abstraction for a system that has a definite state at any particular time, and which changes in response to inputs.
+
+\subsubsection{Example:  Stoplight}
+
+Think of a stoplight, which has a state of red, yellow, or green, and which changes its state in response to an external timer or a button press.
+
+
+\subsubsection{Example:  Revolver}
+
+Or again, of a six-shot revolver, which if we include chamber order has 64 finite state permutations with thirteen possible inputs---to ``load'' or ``clear'' at each chamber and to ``fire''---and two possible outputs---a ``bang'' or a ``click'' accompanied by a new state.
+
+% 6 1
+% 5 6
+% 4 15
+% 3 20
+% 2 15
+% 1 6
+% 0 1
+
+Aggregate or macro actions are also available---a ``moon clip'' corresponds to loading all six chambers at once, and a ``dump cylinder'' corresponds to clearing all six chambers at once.  The revolver is a state machine with a finite number of states, inputs, and outputs.
+
+\footnote{\textct{+poke} and \textct{+peek} derive from \href{https://en.wikipedia.org/wiki/PEEK_and_POKE}{a very old convention in \textct{BASIC}}, wherein \textct{POKE} and \textct{PEEK} commands allowed programmers to write to and read from arbitrary memory addresses.}
+
+We will call a state machine which adheres to the definition of its lifecycle function a \emph{kernel}.  Thus a kernel is a state machine of a certain shape which accepts nouns of a certain shape as input and produces nouns of a certain shape as output.  The kernel is the event loop and some wrapper of library functionality to bound and define the complete behavior of the state machine.  A kernel may be batch or continuous depending on whether its lifecycle function is reentrant.
+
+\subsection{An Evolved State Machine}
+
+While the two-armed model provides a straightforward way to manage state transitions, Nockhounds have found in practice that it is more convenient to supply four arms at the following axes:
+
+\begin{enumerate}
+  \item[\textct{+4}:] \textct{+load} is used in kernel upgrades, allowing the event loop to update itself live.
+  \item[\textct{+10}:] \textct{+wish} accepts a core and parses it against a standard library for the kernel.
+  \item[\textct{+22}:] \textct{+peek} grants read-only access to the system's state; this is often called a ``scry''.
+  \item[\textct{+23}:] \textct{+poke} accepts events and processes them, resulting in a new state noun.
+\end{enumerate}

@@ -1,0 +1,146 @@
+\renewcommand{\chaptertitle}{Moon:  A Higher-Level Language}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  40–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\urbitfont The Nock Book}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+\begin{abstract}
+
+\end{abstract}
+
+While somewhat more economical than a minimal combinator language, Nock is still quite low-level and cumbersome as we have seen.  In this chapter, we will introduce a higher-level language called \emph{Moon} which compiles to a Nock noun.\footnote{The name \emph{Moon} is a double entendre:  it is a micro-\emph{Hoon}, the primary systems language of Urbit and NockApp applications, and it references Kleene's $\mu$-recursive functions.}
+
+\section{Relationship of Moon to Nock}
+
+You can simply understand our goal as to produce executable Nock nouns using a more legible and flexible syntax than pure Nock affords.  But it's worth casting Moon in the context of Nock's evaluation model.
+
+The Moon compiler is a Nock noun which (as subject) operates on a text string to produce a new Nock noun.  This second noun is itself a formula against which well-structured formulas may be evaluated.  Formally, 
+
+\begin{lstlisting}[style=listingcode]
+Moon(source) == Nock(source moon-formula)
+\end{lstlisting}
+
+\noindent
+that is, the evaluation of the Moon compiler as a subject against a source string produces a Nock noun which is the compiled output of the Moon compiler.  We can think of this as a two-step process:  first, we compile the source code to a Nock noun, and then we evaluate other Nock nouns against that noun.
+% TODO check this statement closely, may be out of order
+
+
+\noindent
+where \textct{moon-source} is a text string containing the Moon source code, and \textct{moon-formula} is a Nock noun which is the compiled output of the Moon compiler.  The Moon compiler is itself a Nock noun, and so we can think of it as a self-compiling compiler.\footnote{We here follow the exposition of \citet{Yarvin2010c} in his description the a high-level language compiler to Nock for the first time.}
+
+% Therefore, we need another deliverable: a human-usable language, Watt. Watt is defined as follows:
+% Watt(source) == Nock(source watt-formula)
+% Thus, for instance,
+% urbit-formula == Watt(urbit-source) 
+%               == Nock(urbit-source watt-formula)
+% watt-formula == Watt(watt-source) 
+%              == Nock(watt-source watt-formula)
+% In English, Watt is a self-compiling compiler that translates a source file to a Nock formula. Watt is formally defined by the combination of watt-source and watt-formula. The latter verifies the former. Again, we are not in rocket-science territory here.
+
+We will have to construct Moon in two stages:  a launch stage (``New Moon'') which can only compile simple expressions, a complex construction exemplifying all that we've seen; and a payload stage (``Crescent Moon'') which can compile itself and thus becomes a Nockhound's flywheel (``Full Moon'' being the completed product).  We have two possible ways to construct New Moon as the launch stage:  either we can write the Moon compiler directly in bespoke Nock by hand, or we can compose it in the same language as our interpreter, Rust.
+
+\section{\textrm{🌑} New Moon}
+
+\subsection{Design Criteria}
+
+New Moon is complete when it can compile some set of simple expressions to Nock.  It does not yet, however, need to compile itself, which we defer until Crescent Moon.
+
+Since Nock possesses its own set of idioms (as we've worked out in the preceding chapters), we know what the Nock products need to look like.  A higher-level language can take into account the structure of its target \textsc{isa} in its syntax or not, but we will find it easier to write Moon if we do.  (Hoon takes this road, being essentially a macro language and type system over Nock.)
+
+For instance, in Nock we would apply a function by loading the reference via opcode 9 and then replacing its sample with the new arguments.  In Moon, we need a way to express this intent in an unambiguous way; let's say that we take a page out of Lisp's book and use parentheses to indicate function application.  Thus, we could write a hypothetical Moon expression like this:
+
+\begin{lstlisting}[style=listingcode]
+(+ 1 41)
+\end{lstlisting}
+
+\noindent
+That's reasonable if Lisp-flavored; indeed, we will find that Moon has Lisp-like characteristics.  From a parsing standpoint, this needs to result in an abstract syntax tree (\textsc{ast}) which describes the operation and its arguments, thus detecting the head of the expression as its function and the tail to the ending parenthesis as arguments.  We'll use a syntax in which text is marked by a \textct{\%} cen prefix, resulting in the hypothetical \textsc{ast}:
+
+\begin{lstlisting}[style=listingcode]
+[%add 1 41]
+\end{lstlisting}
+
+\noindent
+and ultimately in the Nock noun (modulo tree addresses):
+
+\begin{lstlisting}[style=listingcode]
+[8 [9 cor 0 arm] 9 2 10 [6 1 1 41] 0 2]
+\end{lstlisting}
+
+\noindent
+(Read it carefully---we pin the core locally with an opcode 8, then we modify the local copy with opcode 10, replacing the sample with the new arguments.)
+
+You can follow a thread of logic from the initial expression in Moon to the final Nock noun, mediated by the \textsc{ast} representation.  New Moon thus has two phases:  a parser and a compiler.  We can build them separately, but first let's look at more examples and their corresponding \textsc{ast} representations.
+
+\subsection{New Moon Examples}
+
+\begin{lstlisting}[style=listingcode]
+::  This is a comment.  It doesn't affect the AST or code.
+
+::  This is a simple expression.
+(+ 1 41)
+
+::  This is a more complex expression.
+(- 54 (+ 3 9))
+
+::  This is a variable declaration.
+(= a 42)
+
+::  This is a loop with a check.
+for (= a 0)
+=a (- )
+\end{lstlisting}
+
+\subsection{Parsing New Moon}
+
+We will soon run out of symbols:  the punctuation in \textsc{ascii} is limited.  We could choose to switch to words throughout or to permit paired punctuation; we will do both eventually but for now we'll let it ride.\footnote{Another alternative is to support Unicode characters, as Julia does, but parsing \textsc{utf}-8 text is more complex than Moon will support out of the box.}
+
+
+\subsection{Compiling New Moon}
+
+
+\section{\textrm{🌙} Crescent Moon}
+
+The objective of Crescent Moon is to bootstrap, or compile itself.  Once we have this capability, expanding Moon to a full language becomes simply a matter of adding more syntax and semantics to the compiler.  This means that Crescent Moon must be able to parse and compile text, with any required types being supplied as well.
+
+
+
+At this point the question of the target \textsc{isa} becomes acute:  should Moon compile to strict Nock or to our extended Mock?  That is, if our compiler utilizes either extended opcodes 6--9 or Mock opcodes 12--XX, how will it relate to the runtime system?  At the end of the day, Nock is Nock (since we can always reduce), but we must make an aesthetic design choice which may have deep implications for Moon.
+
+Let's consider what Hoon does.  Hoon actually targets Mock (with opcode 12 only) and does some sensible reductions and compile-time checks.  For instance, Hoon compilation of opcode 6 can eliminate branches if the conditional reduces to an opcode 1 (see \textct{+cond}).  The runtime compiler and system can make further optimizations:  opcode 11 \textct{\%fast} hints for jets are only checked for opcode 9 expressions, not for opcode 2.  Nock 7 is compiled away entirely.
+
+At this point, we are not interested in optimizations, but there's no reason to forswear their future possibility.  We will therefore make the following design decision:  Moon targets canonical Nock without Mock opcodes (12 and higher).  This will make Moon somewhat less efficient than Hoon as a systems language, but it will remain more legible.
+
+
+
+\section{\textrm{🌕} Full Moon}
+
+From Crescent Moon, building Full Moon becomes a matter of expanding the language syntax, elaborating more parsers and other tools, and producing libraries of useful functions.
+
+(at this point, back out from parentheses to centis for function application)
+
+vase mode and type system redux
+
+What other languages compile to Nock?  The earliest higher-level language was Watt, the ancestor of Hoon. %sss10.tex
+Hoon
+Jock
+
+
+
+currying etc.
