@@ -1,4 +1,4 @@
-\renewcommand{\chaptertitle}{The Roots of Computing in the Ancient World}
+\renewcommand{\chaptertitle}{The Excavation}
 
 %  Make first page footer:
 \fancypagestyle{firststyle}{%
@@ -7,45 +7,80 @@
 \fancyfoot[L]{{\footnotesize
               %% We toggle between these:
               % Manuscript submitted for review.\\
-              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  1–$x$.
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it Nockonomicon} (2025):  1–$x$.
               }}
 }
 %  Arrange subsequent pages:
 \fancyhf{}
-\fancyhead[LE]{{\urbitfont The Nock Book}}
-\fancyhead[RO]{\chaptertitle{}}
-\fancyfoot[LE,RO]{\thepage}
+% \fancyhead[LE]{{\urbitfont Nockonomicon}}
+\fancyhead[LE]{\gothicfont NOCKONOMICON}
+\fancyhead[RO]{\sffamily \chaptertitle{}}
+\fancyfoot[LE,RO]{\gothicfont \thepage}
 
 \chapter{\chaptertitle}
 
 \thispagestyle{firststyle}
 
-\begin{abstract}
-Cuneiform and early computational concepts are explored in this chapter.
-\end{abstract}
-
 \begin{quote}
-Machines are pure products of human intellect, constructed for man’s own purposes. They are nowhere to be found in the world of nature (as products of nature); yet the workings of the laws of nature find their purest expression in machines, purer than in any of the products of nature itself. The laws of nature work directly in machines, with an immediacy not to be found in the products of nature.
-
-(Keiji Nishitani, {\it Religion and Nothingness}, 1982, pp.~129--130)
+  Machines are pure products of human intellect, constructed for man’s own purposes. They are nowhere to be found in the world of nature (as products of nature); yet the workings of the laws of nature find their purest expression in machines, purer than in any of the products of nature itself. The laws of nature work directly in machines, with an immediacy not to be found in the products of nature.  (Keiji Nishitani, {\it Religion and Nothingness}, 1982, pp.~129--130)
 \end{quote}
 
-There are many worthy raconteurs of the history of computing, such as \citet{Hofstadter1980} and \citet{Penrose2004}.  What distinguishes my approach to the history of computing from other tellings?  Computing has deep connexions to alchemy and true language, which I hope to demonstrate without assuming any Hermetic background on the reader's part.  Much like technology, computing is not merely a tool but a stance towards the world.  However, it does not entail technologism's supercession; computing is always both a lens and a kaleidoscope, through which many layers of reality can be seen simultaneously.  It is a way of seeing the world as a system of pure statements and acting to make those statements true.  It is both ontology and epistemology.
+\begin{quote}
+  The sky above the port was the color of television, tuned to a dead channel.  (William Gibson, {\it Neuromancer}, 1984, p.~1)
+\end{quote}
 
-First, therefore, I must establish that computation is the apex of a long human search for a language of truth.  The origin of symbol itself in the σύμβολον, a token broken in half to infallibly mark identity, is one font.  Later ``symbol'' was the profession of faith, both an attempt to formulate truth and a sign of shared claims.  The primary source, however, is language itself, Hofstadter's ``strange loop'' of self-reference.  The first possible Nock formula is a crash, the void.  The second is self-reference, awakening.  Peirce would be proud of the progression.  We have tricked ourselves into thinking that computing is a late development, a fruitful elaboration of the end of mathematics.  In fact, it is the philosopher's stone, and it underlies every process in the world.  It has turned lead into gold.
+The clay of Mesopotamia is dug out (frequently from a riverbank or canal), mixed with water, and left to sit.\footnote{\citet[pp.~297--298]{Taylor2011}.}  The coarse pebbles settle to the bottom, while organic impurities float to the top.  The fine clay in the middle is kneaded and shaped into loaves from which handful were broken off and flattened into tablets.  The best clay has a balance of loess for structure and silicate for surface smoothness.
 
-The historical account which follows aims throughout at the goal of understanding what Nock is and why it matters as a protocol.  The reader will understand what mankind has been looking for, when we have caught various pieces of the puzzle, how these things came together in the mid-20th century, and how they have been refined into a pure machine.
+Into this clay, the scribe would press a stylus to make marks.  Most styli were made of reed, with a triangular tip that produced the characteristic wedge-shaped marks of cuneiform writing; some, however, were of bone or brass.  The pattern of marks represented words, syllables, or numbers, and the scribe would use a combination of these to record information.  Important tablets would then be dried in the sun or baked in a kiln to harden them, making them last for millennia.
 
-Outline:
-- Cuneiform, tabulation, calculation, and algorithm
-- Solid-state indices:  abaci, tokens, etc.  Mechanism as embodied equation.
-- Pure language and true statements (Llull, Leibniz, Wilkins)
-- Generalization (Jacquard, Babbage)
-- The universal machine (Turing, G\"{o}del, Zuse, von Neumann)
-- Pure statements as Pages from the Book (Curry, Church)
+While it's not obvious to us today with paper and screens, clay was in many respects a logical medium for recording and processing information.  It was malleable, reusable, and could be dried to preserve its state indefinitely.  It was also abundant and accessible, making it an ideal material.  As a \emph{medium}, it was the ``thing between'' both the scribe and the information, and between the scribe and the reader.  It was a medium for communication, but also a medium for thought itself.
+
+The first human act of magic was the spoken word, the conveyance of thought from one mind to another immediately.  The second was the written word, the conveyance of thought from one mind to another at a distance in space and time.  The clay tablet was in a real sense the first computer.
 
 \section{Tabulation}
 
+Most of the earliest cuneiform tablets are not records of transactions or stories, but rather tables of numbers.  The first widespread use of writing was to track quantities.  The scribe would make a mark on the clay to represent a quantity, and then group those marks together to represent larger quantities.  We think of this as mundane because Pythagoras won so thoroughly that numbers are invisible to us.  But the scribe was not just recording a number, but rather creating a new entity:  a number that could be manipulated and transformed according to rules.  The scribe was not just writing, but rather inventing the first programming language.\footnote{Neal Stephenson told no lies in \emph{Snow Crash}.}
+
+The spreadsheet appears early in human history:  the Babylonians used tables on cuneiform tablets to keep track of their agricultural production, their trade, and their taxes.  The cuneiform tablet is not merely a record, but a state.  The clay remembers what the scribe knew, and yields it back unchanged to any reader who applies the correct formula.  This is no metaphor:  it is the oldest known implementation of a key-value store, fired in a kiln and buried for four thousand years, waiting.
+
+Likewise, the earliest descriptions of procedures date back to the same era of antiquity.  Particular problems were solved by following a set of instructions:  if you needed the area of a field or the volume of a silo, you followed a recipe.  It was not until the Egyptian Rhind Mathematical Papyrus, however, that the idea is generalized to a procedure that could be applied to any input.  This is the first general algorithm, the first function, the first recorded computer program.  Humans using papyrus and tablets were still the ``hardware'' of the machine, but they were following a program that was independent of their particular circumstances.  The procedure was a pure statement of transformation, and the scribe was an interpreter of that statement.  The written record is RAM, ROM, and a hard drive all at once.  It is the first database, the first spreadsheet, and the first algorithm.  It is the first computer.
+
 \section{Solid-state indices}
 
-The problem is that any calculation lives in someone's head or someone's claim.  This is a summary, but not the proof or solution.
+The downside of clay is that it is slow to write and, although it can be recycled, it is not reusable in the moment.  Papyrus was even less reusable and expensive to manufacture despite its speed advantages.  This situation led to the development of temporary and manipulable physical representations, such as tokens and abaci.  The abacus stored the intermediate steps of a calculation in physical space as the location of beads on a rod, with the ``meaning'' of the beads determined not only by their position and the rules of manipulation, but also by the intent of the user.  The abacus was a physical manifestation of the spreadsheet, a way to keep track of state and perform operations on it without having to write anything down.  It was a register machine, with the beads as registers and the rods as the operations that could be performed on them.  An expression or equation was not merely notional, but embodied in the physical arrangement of the beads.  The abacus was a physical computer, and the scribe was its operator.
+
+\section{Alchemy and Process}
+
+This early success in moving a calculation from the mind to a physical representation spurred more ambitious attempts to mechanize the world---whether the rules of manipulation could themselves be encoded in the device.  The mad Franciscan monk Ramon Llull designed a machine of rotating concentric wheels inscribed with symbols that could be combined to generate true statements about God and the universe.  Gottfried Leibniz built a mechanical calculator, the Stepped Reckoner, and dreamed of a universal language in which all true statements could be proven by calculation.  (Leibniz:  ``Some selected men could finish the matter in five years''\footnote{\citet[p.~224]{Loemker1969}.}; he also introduced the use of I Ching binary numerals.)  These machines were the first compilers, the first attempts to mechanize truth itself into representation.  (They were also the first attempts to mechanize creativity, to build a machine that could generate new insights and ideas rather than simply execute pre-defined instructions.)
+
+Nor were they the first or the last:  the alchemists of the Middle Ages sought to transmute base metals into gold, and in doing so they developed a rich set of processes and transformations that could be applied to substances.  Alchemy described a set of transformations that could be applied to substances to achieve certain effects.  These processes (\emph{albedo}, \emph{rubedo}, \emph{citrinitas}, and \emph{nigredo}) were underspecified, from our modern chemical viewpoint, and relied too much on external appearances.  What, for instance, is the scope of \emph{rubedo}?  \emph{Albedo} is relative rather than an absolute descriptor.  But what these processes pointed towards was fundamentally correct:  processes can be described in sets of primitive operations, and these operations can be implemented in a recipe or program.  They had the wrong set of primitives and operators, but the right idea.  Alchemy has been described as a proto-science, but it was also proto-programming:  it was an ill-formed, inchoate pseudocode for reality that required refinement over its primitives, its operators, and its goals in order to become a true language of transformation.
+
+%Alchemy is hot, in this sense:  it is a description of transformation using innate processes amenable to description and implementation, but which are not yet well-defined.
+
+\section{Generalization}
+
+Llull and Leibniz had built sophisticated toys; like Hero of Alexandria's aeolipile as ancient jet engine, their potential had not penetrated a broader consciousness.  French weaver Joseph Marie Jacquard saw in the repetitive mechanical procedures of the shuttle and loom a new possibility:  that of encoding a fabric pattern as a collection of thread ``instructions'' using a punched cardboard card---a transformation worthy of the alchemists.  Jacquard's loom was the first true compiler, a machine that could take a set of instructions and produce a complex output via transformation into another medium.  Almost incidentally, it was also the first machine to use punched cards, which would later be used in early computers for input and storage.  Jacquard's loom was a physical manifestation of the idea of generalization:  it took a specific pattern and abstracted it into a set of instructions that could be applied to any pattern.  It was the next concrete step towards the universal machine.
+
+English inventor Charles Babbage saw in the loom a prototype for generalizing all kinds of processes.  He designed the Difference Engine, a mechanical calculator that could compute polynomial functions, and later the Analytical Engine, a more general-purpose machine that could be programmed using punched cards.  Babbage's machines were the first truly mechanized general-purpose computers, in the sense that they were designed to be programmable and to execute a wide range of instructions.  The Analytical Engine's mill was a central processing unit, its store was memory, and its punched cards were both input and storage, distant heirs of the abacus and the Mesopotamian clay.
+
+\section{The Universal Machine}
+
+In the twentieth century, the logicians and mathematicians and engineers set to work to unite the various strands of Leibniz's dream and Babbage's machines into a single, coherent vision of a universal machine.  At first they were less concerned with the physical device (although this soon became significant again); they sought a concise formal description of the universal machine itself, a set of primitives and operators that could be used to express any computable function.  Alan Turing's Turing machine, Kurt G\"{o}del's recursive functions, Konrad Zuse's Plankalk\"{u}l, and John von Neumann's architecture were all different approaches to this problem, but they converged on the same conclusion:  there is a simple, abstract machine that can compute anything that is computable.  This was the birth of the modern concept of computation, and it laid the groundwork for the development of actual physical computers.
+
+At the heart of this transition from dream to waking, from the alchemical to the computational, Turing and G\"{o}del struck two fatal blows to the previous conception.  Turing showed that there is no general algorithm for determining whether a given program will halt or run forever, and G\"{o}del showed that there are true statements in mathematics that cannot be proven within any given formal system.\footnote{Indeed, G\"{o}del spent many years believing that Leibniz's work on the \emph{characteristica universalis} had been suppressed by his biographers.}  These results shattered the dream of a complete and consistent formal system that could capture all mathematical truths, and they also showed that there are limits to what can be computed.  However, they also clarified the nature of computation and the universal machine, and they set the stage for the development of actual computers.  The dream of a universal machine found its own limits and in doing so defined itself exactly.
+
+\section{Pure Statements}
+
+At the same time as the formal process itself was undergoing definition, Moses Schönfinkel, Haskell Curry, Alonzo Church, and Stephen Kleene were working on the problem of finding a minimal set of rules (called combinators) that could be used to express any computable operation.  These combinators were pure statements of transformation which could be combined in various ways to produce complex computations.  Unlike alchemical processes, these were well-defined and unambiguous; they likewise bore little resemblance to physical processes.  They were not designed to be implemented in any particular machine, but rather to capture the essence of computation itself.  They became the first pure programming language, in the sense that they were a formal system for expressing computations without reference to any particular machine or implementation.  They were pages from \emph{The Book}.
+
+And so, before there were modern computers there were combinators, and before there were combinators there was the question:  what is the minimum number of operators required to compute anything computable?  It turns out that you can in fact nail it down to one (the $\iota$ combinator) at the cost of extreme obfuscation, but a more practical answer is two:  \textct{S} and \textct{K}.  Two runes, all else is commentary.  (What does it mean that there are one, or two, rather than ten or fifty?  An ontology and theology of the combinators lurks within.)  Virtually all systems elaborate more, sometimes many more, operators and primitives to make computation legible and tractable.
+
+\section{The Ruliad}
+
+Computer scientist Stephen Wolfram has argued that the universe itself is a kind of computation, and that the laws of physics are the rules of this computation.  He has experimented with various simple computational systems, such as cellular automata, and found that they can produce complex behavior that resembles the complexity of the natural world.  This ``new kind of science'' has suggested the Ruliad, or a hypothetical limit of all possible computations, as a way to understand the fundamental nature of reality.\footnote{\citet{Wolfram2002}; \citet{Wolfram2021}.}  The Ruliad is a kind of computational multiverse, in which every possible computation is represented as a point in a vast space of possibilities:  ``the result of following all possible computational rules in all possible ways''.\footnote{\citet{Wolfram2021}.}
+
+We have now excavated the roots of computing and found that they were always there.  The universal machine was always implicit in language, in mathematics, and in the machine.  Mankind's intellectual history is merely the vector by which it excavates itself.  Any non-trivially complex physical process is already performing universal computation---the principle of computational equivalence; therefore, the universe has always been computing, in every grain of sand and collision of particles.  What we call ``computing'' is not a human invention but a \emph{recognition}:  we have learned to read a text that predates us by 13.8 billion years.  Computing kept trying to instantiate itself in purer and purer forms, as we cleaned its gears and polished its brass---and it succeeded.  We have learned to speak the language of the universe, and in so doing we have found that the roots of computing run into the pages of the cosmos itself.
+
+Nock is one extremely pure, minimal, frozen dialect of that universal text, but it is not the only one, as we have seen; its concision and expressiveness serves as our point of embarking into the Ruliad.  The version of the Nock specification we use is called Nock 4K---meaning that it has four revisions remaining before it is sealed, a countdown frozen into its name.
+%This is a powerful attractor, and it is one reason why Nock is the right point of embarkation for our exploration of the Ruliad.
+Nock 4K is one particular field of points in the Ruliad, a simple and elegant language that captures the essence of computation itself.  Four revisions remain, then it freezes forever.  Let us begin.

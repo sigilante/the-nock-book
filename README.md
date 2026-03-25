@@ -1,4 +1,4 @@
-# *The Nock Book*
+# *Nockonomicon*
 ##  N. E. Davis
 
 An investigation into the foundations of solid-state computing.

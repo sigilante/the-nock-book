@@ -1,4 +1,4 @@
-\renewcommand{\chaptertitle}{Combinators for Fun and Profit}
+\renewcommand{\chaptertitle}{The Letters}
 
 %  Make first page footer:
 \fancypagestyle{firststyle}{%
@@ -7,12 +7,12 @@
 \fancyfoot[L]{{\footnotesize
               %% We toggle between these:
               % Manuscript submitted for review.\\
-              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it The Nock Book} (2025):  10–$x$.
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it Nockonomicon} (2025):  10–$x$.
               }}
 }
 %  Arrange subsequent pages:
 \fancyhf{}
-\fancyhead[LE]{{\urbitfont The Nock Book}}
+\fancyhead[LE]{{\urbitfont Nockonomicon}}
 \fancyhead[RO]{\chaptertitle{}}
 \fancyfoot[LE,RO]{\thepage}
 
@@ -20,15 +20,18 @@
 
 \thispagestyle{firststyle}
 
-\begin{abstract}
+\begin{quote}
+  \sloppy
+  Prometheus is creative in the modern sense:  his thought has a forward momentum that propels it beyond the bounds of divine decree.  With an eye toward his own piece of the divine action, he schemes, plans, and analyzes, and thus abandons the more contemplative \mbox{``afterthought''} mode of being whereby insights are caught on the cosmic rebound.  In a large sense, Prometheus learns to think for himself---learns to kindle his own intellectual fire rather than bask in the fire-illuminated exapnse of the gods.  (David Grandy, {\it The Speed of Light:  Constancy and Cosmos}, 2009, p.~159)
+\end{quote}
 
-\end{abstract}
+We could begin our practical exploration of computing with cuneiform, but we will skip ahead to the combinator, a directly relevant component of excavated computing.  The combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  This fundamental approach lets us build a computer out of combinators alone, which we can then elaborate with real hardware into a practical machine.
 
-The first section of this chapter will introduce the basic \textct{SKI} and \textct{BCKW} combinator calculi and examine how they can represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
+The first section of this chapter will introduce the basic \textct{SKI} and \textct{BCKW} combinator calculi and examine how they can mutually represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
 
 \section{Combinators in Computing}
 
-The pioneers of computing elaborated three complementary visions:
+The pioneers of computing elaborated (at least) three complementary visions:
 
 \begin{enumerate}
   \item  The Turing machine, a simple abstract machine that can compute anything computable.
@@ -36,16 +39,15 @@ The pioneers of computing elaborated three complementary visions:
   \item  Combinatory logic, a variable-free functional language based on combinators.
 \end{enumerate}
 
-Logicians early demonstrated the equivalence of these approaches, but particular formulations are still preferred for particular tasks.  The Turing machine is the most intuitive model of computation, and is often used to prove computability results.  The lambda calculus is the basis of many functional programming languages, such as Lisp, Scheme, and Haskell.  Combinatory logic is less widely used in practice, but has a long history in mathematical logic and type theory.  It is also the basis of Nock.
+Logicians soon demonstrated the equivalence of these approaches, but particular formulations are still preferred for particular tasks.  (And because these are formally equivalent, many theorems can be proven about the easiest case to reason with, then the conclusion transposed to the others.)  The Turing machine is the most intuitive model of computation, and is often used to prove computability results.  The lambda calculus is the basis of many functional programming languages, such as Lisp, Scheme, and Haskell.  Combinatory logic is less widely used in practice, but has a long history in mathematical logic and type theory.  It is also the basis of Nock.
 
 Before we get too far out over our skis, let's talk about what a combinator is.  At its simplest, a combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  In practice, we'll use different combinators to build up more complex functions, and we'll see informally how they can be combined to express any computable function.  We can even build combinators out of other combinators.  The objective of combinatory logic is to express all computation in terms of combinators alone, without the need for variables or named functions.
 
-This first section will introduce some elemental and compound combinators and make the case that they circumscribe ``computing'' as a concept.
+This first section will introduce some elemental and compound combinators and make the case that they circumscribe ``computing'' as a concept.  There are several systems which can be built out of combinators, but we will focus on the \textct{SKI} and \textct{BCKW} systems, which are the most well-known and widely studied.  We will also introduce Chris Barker's universal $\iota$ combinator, which yields all the others.  Finally, we will show how Nock's opcodes can be used as combinators to express various combinator idioms.
 
 \subsection{The \textct{SKI} calculus}
 
-Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \textct{SKI} combinator calculus, which has three combinators:
-
+Computable functions can be expressed using minimal sets of combinators.  Many logicians today prefer to work with Moses Schönfinkel and Haskell Curry's \textct{SKI} combinator calculus, which has three combinators.  (We previously introduced this as the \textct{SK} system with two combinators; the \textct{I} combinator is often included as a primitive to ease calculations, but it can be derived from \textct{S} and \textct{K} alone, so we will treat it as a primitive combinator for now.)
 
 The identity combinator \textct{I} is conventionally written \textct{Ix = x}.  This simply means that it returns its single argument unchanged.  There is little to say of this combinator at this point, but logicians have found that it frequently simplifies expressions.
 
@@ -72,7 +74,9 @@ The substitution combinator \textct{S} is conventionally written \textct{Sxyz = 
 S x y z == x z (y z)
 \end{lstlisting}
 
-The \textct{SKI} system is Turing complete (= $\mu$-recursive), meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equi\-valent \textct{SKI} expression and vice versa (\citet{Kleene1952}, Theorem XXX).\footnote{Four approaches to general-purpose computing were devised around the same time:  Moses Schönfinkel and Haskell Curry's combinator \textct{SKI} calculus (1920s); Alonzo Church's lambda calculus \textct{λC} (1936); Alan Turing's tape machine (1936); and Stephen Kleene's $\mu$-recursive functions (1936) building on Kurt G\"{o}del's primitive recursive (1931) and general recursive functions (1934).  These have been demonstrated to be equivalent to each other by means of the Church--Turing thesis:  ``Every effectively calculable function is a computable function.''  Various auxiliary proofs establish the isomorphic nature of these systematic approaches; however, a footnote much larger than the length of this book is warranted to address the relationships amongst these four formulations.  We simply take for granted their equivalence and move freely between representations as necessary.  Furthermore, other formulations, such as the structured program theorem for control flow graphs \citep{Bohm1966}, exist and merit future exploration.}
+The \textct{SKI} system is Turing complete (= $\mu$-recursive), meaning that any computable function can be expressed using only these three combinators.  It is also equivalent to the lambda calculus, meaning that any lambda expression can be translated into an equivalent \textct{SKI} expression and vice versa.\footnote{\citet{Kleene1952}, p.~376, Theorem XXX.
+% I've double-checked this:  XXX is 30, not a placeholder.
+Four approaches to general-purpose computing were devised around the same time:  Moses Schönfinkel and Haskell Curry's combinator \textct{SKI} calculus (1920s); Alonzo Church's lambda calculus \textct{λC} (1936); Alan Turing's tape machine (1936); and Stephen Kleene's $\mu$-recursive functions (1936) building on Kurt G\"{o}del's primitive recursive (1931) and general recursive functions (1934).  These have been demonstrated to be equivalent to each other by means of the Church--Turing thesis:  ``Every effectively calculable function is a computable function.''  Various auxiliary proofs establish the isomorphic nature of these systematic approaches; however, a footnote much larger than the length of this book is warranted to address the relationships amongst these four formulations.  We simply take for granted their equivalence and move freely between representations as necessary.  Furthermore, other formulations, such as the structured program theorem for control flow graphs \citep{Bohm1966}, exist and merit future exploration.}
 
 Combinators can be combined to form more complex expressions.  For example, the combinator \textct{S K K} is equivalent to the identity combinator \textct{I}, which can be proven thus:
 
@@ -85,6 +89,13 @@ z
 \noindent
 In such cases, combinators are applied from left to right by the first possible reduction.  This means that they will bottom out in a particular expression, which may be the argument (as with \textct{I x == x}).
 
+At this point, evaluation eagerness starts to matter:  when we evaluate an expression, we need to decide which combinator to apply first or whether they apply at the ``same time'' (as with \textct{S K K}).  The standard convention is to apply combinators from left to right, which means that we will evaluate the leftmost combinator first.  This is known as leftmost reduction, and it ensures that we will eventually reach a normal form if one exists.  However, there are other reduction strategies, such as rightmost reduction or parallel reduction, which can lead to different results in some cases.  The choice of reduction strategy can affect the efficiency of evaluation and the order in which results are produced, but it does not affect the final result of the computation.  One gentle exception to this is the \textct{Y} combinator, which we will discuss in the next section; it is a fixed-point combinator that allows for recursion, and its behavior can be sensitive to the reduction strategy used.
+
+Similarly, \textct{I} can be expressed in terms of \texttt{S} and \texttt{K} alone:
+
+\begin{lstlisting}[style=listingcomb]
+I x == S K K x
+\end{lstlisting}
 
 
 % https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
@@ -119,6 +130,8 @@ W x y == x y y
 
 
 
+
+
 % The duplication combinator \textct{U} is conventionally written \textct{Uxyz = xzyz}.  This means that it takes three arguments: a function \textct{x}, and two values \textct{y} and \textct{z}.  It applies the function \textct{x} to the values \textct{z}, \textct{y}, and \textct{z} again.  This combinator is less common, but can be useful in certain contexts.
 
 The \textsc{SKI} and \textsc{BCKW} systems are equivalent, meaning that any expression in one system can be translated into an equivalent expression in the other system.  For example, the identity combinator \textct{I} can be expressed in \textsc{BCKW} as:
@@ -128,23 +141,69 @@ I = W K
 
 \end{lstlisting}
 
+BCKW makes these explicit as named combinators. SKI forces you to build duplication and composition from scratch each time using only substitution and constant. This is why BCKW is often preferred for studying the semantics of programming language features — each combinator names a specific capability, and you can ask "which features require W? which require C?" as a way of classifying programs.
 
-\textct{U}
 
-\textct{Y}
+% Turing Theta subsection
+\subsection{\textsc{Θ}}
+
+\subsection{\textct{Y}}
+
+The real issue is that \textct{Y} encodes infinite structure.  Any fixed-point combinator must somehow represent \textct{f (f (f ...))} to an infinite depth.  The question is whether that infinite structure is eagerly materialized or lazily demanded.
+
+Why, beyond the fact that it is a different basis, would we want to use \textct{BCKW} instead of \textct{SKI}?  The answer is that \textct{BCKW} has a more direct relationship to recursion, which is a fundamental aspect of computation.  In particular, the \textct{Y} combinator is the payoff that justifies caring about \textct{BCKW} at all.  The argument runs thusly:
+
+\begin{enumerate}
+  \item  \textct{SKI} is Turing complete---but how do you get recursion?
+  \item  You need \textct{Y}---but \textct{Y} in \textct{SKI} is hideous
+  \item  \textct{BCKW} makes \textct{Y} clean because \textct{W} is the duplication that recursion needs
+\end{enumerate}
+
+\noindent
+Therefore \textct{BCKW} is not just an alternative basis, it's a more explanatory basis for why recursion works at all in a combinator system.
+
+Then Nock opcode 9 is the punchline: it implements self-referential arm invocation directly, which is essentially Y baked into the hardware. You don't write Y in Nock because the calling convention already assumes it. That's a genuine design insight worth stating explicitly in the chapter.
 
 \begin{lstlisting}[style=listingcomb]
 Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
 \end{lstlisting}
 
-\textct{MABT} or whatever it is
+Two is the minimum for communication — a sender and a receiver, a constant and a variable, K and S. Peirce's firstness and secondness before thirdness can emerge. You could make this case seriously without it becoming mysticism.
 
-Chris Barker
-The iota combinator \textct{ι} can produce all the others, but in convoluted ways.
+\subsection{\textct{ι}}
 
+We are now prepared to confront Chris Barker's universal \textct{ι} combinator, which yields all the others.\footnote{\href{https://web.archive.org/web/20160823182917/http://semarch.linguistics.fas.nyu.edu/barker/Iota/}{\citet{Barker2001}}.}  \textct{ι} is truly weird and has no direct analogue in human language or legible operators; it represents a kind of ultimate compression, a single combinator that can express all the others.  \textct{ι} can be defined as follows in the \textsc{SK} system:
+
+\begin{lstlisting}[style=listingcomb]
+ι x = x S K
+\end{lstlisting}
+
+\noindent
+From this definition, we can derive the other combinators, such as \textct{S} and \textct{K} (and \emph{a fortiori} the rest):
+
+\begin{lstlisting}[style=listingcomb]
+K = ι (ι (ι ι))
+S = ι (ι K)
+\end{lstlisting}
+
+\noindent
+The derivations are somewhat complex, but this gives you a flavor:
+
+% TODO fix rendering of iota and parentheses
+\begin{lstlisting}[style=listingcomb]
+ι (ι (ι ι)) x y = (ι (ι ι)) S K x y     -- apply outer ι
+                = (ι ι) S K S K x y   -- apply next ι
+                = ι S K S K x y       -- apply ι ι -> ι S K
+                = S K K S K x y       -- apply ι to S
+                = K x (K x) y         -- S reduction: SKKx = Kx (Kx)
+                = x                   -- K drops second arg
+\end{lstlisting}
+
+\textct{ι} serves as a boundary condition, a proof that the search for minimality has a known terminus, but that terminus is not where we want to live.\footnote{Barker from the beginning encourage the exploration of the \textct{ι} combinator space.}
 % https://stackoverflow.com/questions/7368507/expressing-y-in-term-of-ski-combinators-in-javascript
+Combinator calculi (and their cousin, the lambda calculus) are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  This austerity motivates why Nock has twelve opcodes rather than merely one or two:  practical expressiveness is the design criterion, not theoretical minimality.  The spec is engineered to its purpose rather than being the smallest possible size.  It is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
 
-Combinator calculi are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  Thus it is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
+Nock is also a changing specification, albeit slowly and within finite bounds.  Nock embeds its own hyperstition by ``kelvin versioning'' or a cooling refinement:  it is drawn inexorably towards a particular future, and so it is not just a standard of computation but a standard of the future of computation.  That is, at each revision, it becomes more and more difficult to change, until Nock finally freezes at revision 0K.
 
 \section{Nock Opcodes as Combinator}
 
@@ -585,7 +644,7 @@ While it is beyond our scope to prove the equivalence of the four formulations o
 \noindent
 Nock as operator over nouns satisfies these requirements with the natural numbers (including crash \textct{[0 0]} as blank) and cells to constitute nouns, while the transition function is represented by the evaluation rules of Nock itself.
 
-Finally, Nock is generally recursive (or $\mu$-recursive) because it has the necessary building blocks (\citet{Paulsen1995}; \citet{Boolos2002}, ``6.2 Minimization'', pp.~70–71):
+Finally, Nock is generally recursive (or $\mu$-recursive) because it has the necessary building blocks:\footnote{\citet{Boolos2002}, ``6.2 Minimization'', pp.~70–71.}
 
 \begin{itemize}
   \item  Constant function including zero (opcode 1)

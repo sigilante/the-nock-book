@@ -7,8 +7,14 @@
 \addbibresource{main.bib}
 
 \usepackage{fontspec}
+% \setmainfont{TT-JTCE'EE'CE'i`M9P}
 \setsansfont{Helvetica}
-\newfontfamily\gothicfont{Textura Libera Tenuis}
+\newfontfamily\gothicfont{Textura Libera Tenuis Bold}
+\newfontfamily\gothiclightfont{Textura Libera Tenuis}
+\usepackage{titlesec}
+\titleformat{\chapter}{\sffamily\bfseries\Large}{Chapter~\thechapter}{1em}{}
+\titleformat{\section}{\sffamily\bfseries\large}{\thesection}{1em}{}
+\titleformat{\subsection}{\sffamily\bfseries}{\thesubsection}{1em}{}
 
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -34,7 +40,7 @@
 
 %% MANUSCRIPT
 \title{\fontsize{36pt}{36pt}\gothicfont NOCKONOMICON}
-\author{\fontsize{24pt}{24pt}\gothicfont\authorname}
+\author{\fontsize{24pt}{24pt}\gothiclightfont\authorname}
 \date{}
 
 \begin{document}
@@ -57,6 +63,7 @@
 
 \mainmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\input{txt/foreword}
 \input{txt/roots_of_computing}
 \input{txt/practical_combinators}
 \input{txt/interpreter_runtime}
@@ -72,18 +79,6 @@
 
 \appendix
 \input{txt/hoon_proper}
-
-% 1. The roots of computing 
-% 2. Practical combinators & design patterns/idioms  (including virtualization)
-% 3. An interpreter runtime 
-% 4. A higher level language (micro Hoon, Moon)
-% 5. Bootstrapping Moon (parsers etc) 
-% 6. Types, doors, etc.
-% 7. The event loop
-% 8. A toy runtime
-% 9. Userspace loops upon loops, scrying
-% 10. Jets and hints
-% 11. Hoon proper, Jock
 
 \selectlanguage{USenglish}
 \printbibliography
