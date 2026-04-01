@@ -1,0 +1,81 @@
+\renewcommand{\chaptertitle}{The Tools}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it Nockonomicon} (2025):  75–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\gothicfont Nockonomicon}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+
+A Nock noun is latent until \texttt{*} evaluates it.  Nock formulas are constructed, applied as discrete events to a subject, and result in new nouns.  These are then used as subjects or formulas for further evaluation.  From a pragmatic standpoint, we need a platform to evaluate subject--formula pairs (which we will call a runtime) and a set of design patterns to build new subjects and formulas for evaluation.
+
+\section{A Runtime Evaluation Layer}
+
+\section{Executable Nouns}
+
+An attempt may be made to evaluate any noun as a Nock formula; obviously most formulas are malformed and will crash.  Executable nouns are also only valid with reference to a given subject:  \lstinline[style=inlinecode]{*[42 [0 2]]} will fail because the subject 42 is an atom, and so cannot be addressed with the axis 2.
+
+The most common way to evaluate Nock is for the formula to access a noun in the subject, modify it in a characteristic way, and then evaluate the resulting modified noun.  We call this stored pattern a gate, the most common and convenient way to implement a function or a subroutine in Nock.  The gate is stored with an opcode \lstinline[style=inlinecode]{1} so it can be retrieved with opcode \lstinline[style=inlinecode]{9} and manipulated as a constant noun prior to execution.
+
+For instance, this Nock program makes a gate that returns its argument incremented by \lstinline[style=inlinecode]{1}:
+
+\begin{lstlisting}[style=listingblock]
+[8 [1 0] [1 4 0 6]]
+\end{lstlisting}
+
+It composes a constant \lstinline[style=inlinecode]{0} (default input) with the pinned gate formula \lstinline[style=inlinecode]{[1 4 0 6]}, which retrieves the argument (axis 6) and applies the increment opcode \lstinline[style=inlinecode]{4} to the retrieved value.  The \lstinline[style=inlinecode]{[0 1]} tail is expanded by the cell distribution rule so that the resulting Nock formula \lstinline[style=inlinecode]{[4 0 6]} is actually evaluated.
+
+One way to invoke it with an opcode \lstinline[style=inlinecode]{9} looks like this:
+
+\begin{lstlisting}[style=listingblock]
+:: compose
+[7
+   :: pin a gate with default sample argument 0
+   [8 [1 0] [1 4 0 6] 0 1]
+   :: pin access to the subject locally
+   [8 [0 1]
+      :: invoke the gate with the variable argument
+      [9 2
+         10 [6 7 [0 3] 1 5] 0 2]]
+]
+\end{lstlisting}
+
+The meat of the pattern lies in the opcode \lstinline[style=inlinecode]{9} expression, which we may gloss as follows:
+
+\begin{enumerate}
+  \item  Retrieve the gate (using opcode \lstinline[style=inlinecode]{0}).
+  \item  Modify the gate via opcode \lstinline[style=inlinecode]{10} by replacing the \lstinline[style=inlinecode]{0} pin with the argument, in this case \lstinline[style=inlinecode]{5}.
+  \item  Invoke the modified gate.
+\end{enumerate}
+
+You can expand it using the rules for opcodes 7, 8, and 9 (using 0 as an unused placeholder subject):
+
+\begin{lstlisting}[style=listingblock]
+*[a 7 b c]          *[*[a b] c]
+*[a 8 b c]          *[[*[a b] a] c]
+*[a 9 b c]          *[*[a c] 2 [0 1] 0 b]
+\end{lstlisting}
+
+One way to think of Nock functions is as hygienic macros in the Lisp tradition. The gate pattern is a way to implement a macro that takes one argument and produces a new noun based on it.
+
+\subsection{Key Design Patterns}
+
+executable nouns
+building gates
+event loop
+
+\section{The Event Loop}

@@ -1,0 +1,84 @@
+\renewcommand{\chaptertitle}{The Virtues}
+
+%  Make first page footer:
+\fancypagestyle{firststyle}{%
+\fancyhf{}% Clear header/footer
+\fancyhead{}
+\fancyfoot[L]{{\footnotesize
+              %% We toggle between these:
+              % Manuscript submitted for review.\\
+              \authorname{}~\authorpatp{}.  ``\chaptertitle{}''.  {\it Nockonomicon} (2025):  75–$x$.
+              }}
+}
+%  Arrange subsequent pages:
+\fancyhf{}
+\fancyhead[LE]{{\gothicfont Nockonomicon}}
+\fancyhead[RO]{\chaptertitle{}}
+\fancyfoot[LE,RO]{\thepage}
+
+\chapter{\chaptertitle}
+
+\thispagestyle{firststyle}
+
+\begin{quote}
+  Metacircularity in most languages is a curiosity and corner case.  Programmers are routinely warned not to use it, and for good reason.  Practical metacircularity is a particular strength of Nock, or any functional assembly language.  Dynamic loading and/or virtualization works, at least logically, as in an OS.
+
+  \ldots{} A metacircular functional dissemination protocol can serve as a complete, general-purpose system software environment—there is no problem it cannot solve, in theory or in practice.  Such a protocol can be described as an “operating function” or OF—the functional analog of an imperative operating system. (\texttt{\textasciitilde sorreg-namtyv}, 2010)
+\end{quote}
+
+Nock is a crash-only language:  the first coherent formula is the pair \lstinline[style=inlinecode]{[0 0]}, the crash.  There is no error handling in raw Nock, no exceptions.  On the one hand, this is a strength:  a Nock noun produces no formal side effects, and may be tried again with a different subject or formula if it fails.  On the other, naïve Nock has no way to recover from failure.  The trick to doing this correctly is to operate virtually, to produce a Nock interpreter that runs on top of Nock itself, and to use this interpreter to run Nock programs.  This allows us to catch errors and respond to them in a controlled way, while still maintaining the purity and simplicity of Nock as a language.\footnote{This chapter draws on \citet{lacnes2025} with the blessing of author and publisher.  Incidental quotations are made without attribution for readability.}
+
+What could we want of a virtualized Nock interpreter?  The most important factor is error handling, but we can build more complex macros, even new opcodes, into any interpreter as well.
+
+While virtualization necessarily incurs some overhead relative to more direct execution, it gives the Nock programmer a way to bail (crash), trace (log with debugging information), and bind (limit in some sense\footnote{Like stack depth.}) a computation. In fact, stack traces are computed through virtualization, and so are guaranteed to be as correct as their implementation.
+
+A Nock-in-Nock virtualization environment needs to distinguish at least three kinds of results:
+\begin{enumerate}
+  \item A successful result of computation, along with a valid Nock noun.
+  \item A block, which indicates that the computation is not yet complete and should be continued.
+  \item A halt or deterministic error, which indicates that the computation has failed and should not be continued.
+\end{enumerate}
+
+\section{Virtualized Axiomatic Operators}
+
+The foundation of a virtualized Nock interpreter (let's call it, for convenience, \lstinline[style=inlinecode]{icon}\footnote{In conventional Urbit programming, the corresponding virtualized function is called ``\lstinline[style=inlinecode]{mock}''}.  \citet{lacnes2025} called the corresponding function ``\lstinline[style=inlinecode]{pink}''.) is the set of axiomatic operators utilized in the opcodes, such as XXX
+
+These virtual operators can be implemented as nouns in raw Nock in such a way that they do not crash.  These then serve as guards for the opcodes, which can be implemented as macros to call these virtual operators.  For example, tree addressing can be virtualized by recursively checking whether the current noun is a cell or an atom until the desired address is reached or something expected to be a cell is in fact an atom, in which case we can return a false result (and any error trace).
+
+Conceptually, we need to implement the following virtualized axiomatic operators:
+
+\begin{enumerate}
+  \item  \lstinline[style=inlinecode]{?} cell check
+  \item  \lstinline[style=inlinecode]{+} increment
+  \item  \lstinline[style=inlinecode]{=} equality check
+  \item  \lstinline[style=inlinecode]{/} axis
+  \item  \lstinline[style=inlinecode]{*} evaluate
+  \item  \lstinline[style=inlinecode]{#} edit
+\end{enumerate}
+
+\noindent
+We need to build these as individual nouns in raw Nock, then compose them together in such a way that we can call them from our virtualized interpreter.
+
+\begin{lstlisting}[style=listingcomb]
+\end{lstlisting}
+
+\section{Virtualized Opcodes}
+
+is a set of virtualized opcodes, which are implemented as Nock formulas that can be called from within the interpreter.  These opcodes can be used to implement the axiomatic operators of Nock driect
+, such as cell construction and deconstruction, as well as more complex operations such as error handling and logging.
+
+
+\section{Beyond Nock}
+
+Traditionally, opcode 12 has been used to permit the hyper-Turing ``scry'' operator, which allows you to look up a bound persistent value in a referentially transparent way.  This is especially useful when a necessary value is not available in the current subject or needs to be supplied by the runtime (such as a system date or entropy).
+
+We can also implement the combinators as extended Nock opcodes, aiding us in building more complex expressions from our higher-level language compiler when we get there.
+
+\begin{enumerate}
+  \item[13.]  \textct{B} composition operator
+  \item[14.]  \textct{C} flip operator
+  \item[15.]  \textct{W} join operator
+  \item[16.]  \textct{U} duplication operator
+  \item[17.]  \textct{XXX}
+\end{enumerate}
+

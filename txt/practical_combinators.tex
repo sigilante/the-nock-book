@@ -12,8 +12,8 @@
 }
 %  Arrange subsequent pages:
 \fancyhf{}
-\fancyhead[LE]{{\urbitfont Nockonomicon}}
-\fancyhead[RO]{\chaptertitle{}}
+\fancyhead[LE]{\gothicfont NOCKONOMICON}
+\fancyhead[RO]{\sffamily \chaptertitle{}}
 \fancyfoot[LE,RO]{\thepage}
 
 \chapter{\chaptertitle}
@@ -25,7 +25,11 @@
   Prometheus is creative in the modern sense:  his thought has a forward momentum that propels it beyond the bounds of divine decree.  With an eye toward his own piece of the divine action, he schemes, plans, and analyzes, and thus abandons the more contemplative \mbox{``afterthought''} mode of being whereby insights are caught on the cosmic rebound.  In a large sense, Prometheus learns to think for himself---learns to kindle his own intellectual fire rather than bask in the fire-illuminated exapnse of the gods.  (David Grandy, {\it The Speed of Light:  Constancy and Cosmos}, 2009, p.~159)
 \end{quote}
 
-We could begin our practical exploration of computing with cuneiform, but we will skip ahead to the combinator, a directly relevant component of excavated computing.  The combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  This fundamental approach lets us build a computer out of combinators alone, which we can then elaborate with real hardware into a practical machine.
+\begin{quote}
+  Those who search for gold dig over much earth and find a little.  (Heraclitus the Obscure, DK 22B22, tr.\ Jonathan Barnes)
+\end{quote}
+
+We could begin our practical exploration of computing with cuneiform, but we will elide several millennia and skip ahead to the combinator, the most recently excavated component of computing.  The combinator is a mathematical concept, a function that takes one or more arguments and returns a result without referring to any variables outside its own arguments.  A combinator system demarcates a self-contained field of play within the Ruliad.  This fundamental approach lets us build a computer out of combinators alone, which we can then elaborate with real hardware into a practical machine.
 
 The first section of this chapter will introduce the basic \textct{SKI} and \textct{BCKW} combinator calculi and examine how they can mutually represent each other.  The second section will introduce Nock's opcodes as combinators, and show how they can be used to express various combinator idioms.  The third section will show how to build practical affordances for common programming tasks, such as conditionals, recursion, subprocedure invocation, and data structures.  The final section will discuss the relationship between combinators and virtualization, and how Nock can be used to build a virtual machine even in a crash-only context.
 
@@ -41,7 +45,7 @@ The pioneers of computing elaborated (at least) three complementary visions:
 
 Logicians soon demonstrated the equivalence of these approaches, but particular formulations are still preferred for particular tasks.  (And because these are formally equivalent, many theorems can be proven about the easiest case to reason with, then the conclusion transposed to the others.)  The Turing machine is the most intuitive model of computation, and is often used to prove computability results.  The lambda calculus is the basis of many functional programming languages, such as Lisp, Scheme, and Haskell.  Combinatory logic is less widely used in practice, but has a long history in mathematical logic and type theory.  It is also the basis of Nock.
 
-Before we get too far out over our skis, let's talk about what a combinator is.  At its simplest, a combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  In practice, we'll use different combinators to build up more complex functions, and we'll see informally how they can be combined to express any computable function.  We can even build combinators out of other combinators.  The objective of combinatory logic is to express all computation in terms of combinators alone, without the need for variables or named functions.
+Before we delve deeper into the ``Turing tarpit'',\footnote{\citet{Perlis1982}.} let's talk about what a combinator is.  At its simplest, a combinator is a function that takes one or more arguments and returns a result, without referring to any variables outside its own arguments.  In practice, we'll use different combinators to build up more complex functions, and we'll see informally how they can be combined to express any computable function.  We can even build combinators out of other combinators.  The objective of combinatory logic is to express all computation in terms of combinators alone, without the need for variables or named functions.
 
 This first section will introduce some elemental and compound combinators and make the case that they circumscribe ``computing'' as a concept.  There are several systems which can be built out of combinators, but we will focus on the \textct{SKI} and \textct{BCKW} systems, which are the most well-known and widely studied.  We will also introduce Chris Barker's universal $\iota$ combinator, which yields all the others.  Finally, we will show how Nock's opcodes can be used as combinators to express various combinator idioms.
 
@@ -97,6 +101,9 @@ Similarly, \textct{I} can be expressed in terms of \texttt{S} and \texttt{K} alo
 I x == S K K x
 \end{lstlisting}
 
+\noindent
+It is of course frequently retained for economy, a harbinger of decisions to come.
+
 
 % https://en.wikipedia.org/wiki/Magnum_opus_(alchemy)
 
@@ -144,12 +151,39 @@ I = W K
 BCKW makes these explicit as named combinators. SKI forces you to build duplication and composition from scratch each time using only substitution and constant. This is why BCKW is often preferred for studying the semantics of programming language features — each combinator names a specific capability, and you can ask "which features require W? which require C?" as a way of classifying programs.
 
 
-% Turing Theta subsection
-\subsection{\textsc{Θ}}
+\subsection{\textct{Y} Fixed-Point}
 
-\subsection{\textct{Y}}
+One thing that the \textct{SKI} system lacks is a clean way to express recursion, or self-reference.  This is because the combinators in \textsc{SKI} do not have any way to refer to themselves or to other combinators.  To solve this problem, we can introduce a new combinator called \textct{Y}, which is defined as follows:
 
-The real issue is that \textct{Y} encodes infinite structure.  Any fixed-point combinator must somehow represent \textct{f (f (f ...))} to an infinite depth.  The question is whether that infinite structure is eagerly materialized or lazily demanded.
+\begin{lstlisting}[style=listingcomb,frame=tb]
+Y f == f (Y f)
+\end{lstlisting}
+
+We call this a \emph{fixed-point combinator} because it allows us to find a fixed point of a function, which is a value that is unchanged by the function.  In other words, if we have a function \textct{f} that takes a function as an argument and returns a function, then \textct{Y f} will return a function that is a fixed point of \textct{f}.  This means that we can use \texttt{Y} to express recursion in the \textsc{SKI} system, which is essential for expressing many computable functions.
+
+In SKI, self-reference requires Y because there's no addressing — functions have no names, no locations, no way to refer to themselves except by being passed to themselves explicitly. That's what S I I (S I I) does: it hands a copy of itself to itself.
+
+
+In Nock, self-reference is structural. The formula lives at a known axis of the subject. Opcode 0 finds it. No Y needed because the noun tree already encodes the fixed point — the battery is always at axis 2, the sample at axis 6, and a recursive call is just "retrieve axis 2 and evaluate it against a modified subject." Y is the combinator-calculus workaround for the absence of addressing. Nock has addressing, so Y dissolves into opcode 0.
+For the book:
+This is worth a dedicated paragraph in the combinators chapter. The argument is:
+
+Y solves the problem of self-reference without names or addresses
+Nock has addresses — opcode 0
+Therefore Nock doesn't need Y; self-reference is structural not combinatorial
+Opcode 9 is syntactic sugar over opcode 2 over opcode 0 — peel the layers and recursion is just tree addressing all the way down
+
+Nock does not need a fixed-point combinator like \texttt{Y} because it has a built-in mechanism for self-reference through its opcode 0, which retrieves the formula from a known axis of the subject.  This means that recursion in Nock is achieved through structural self-reference rather than combinatorial self-reference, and thus does not require a separate combinator to express it.  For the same self-referential reason, it is trivial to compose certain kinds of quines in Nock using opcode 0, e.g.,
+
+\begin{lstlisting}[style=listingcomb]
+*[[0 1] 0 1]
+*[[[0 2] 0 3] [[0 2] 0 3]]
+\end{lstlisting}
+
+\noindent
+Since Nock is a partial function, the result of subject--formula evaluation is a new noun, which can be fed back into the next evaluation as a new subject.
+
+Any fixed-point combinator must somehow represent \textct{f (f (f ...))} to an infinite depth.  The question is whether that infinite structure is eagerly materialized or lazily demanded---Nock's referential structure facilitates the latter.  (The real issue for \textct{Y} in \textct{SKI} terms is that it encodes infinite structure.)
 
 Why, beyond the fact that it is a different basis, would we want to use \textct{BCKW} instead of \textct{SKI}?  The answer is that \textct{BCKW} has a more direct relationship to recursion, which is a fundamental aspect of computation.  In particular, the \textct{Y} combinator is the payoff that justifies caring about \textct{BCKW} at all.  The argument runs thusly:
 
@@ -170,16 +204,16 @@ Y = S (K (S I I)) (S (S (K S) K) (K (S I I)))
 
 Two is the minimum for communication — a sender and a receiver, a constant and a variable, K and S. Peirce's firstness and secondness before thirdness can emerge. You could make this case seriously without it becoming mysticism.
 
-\subsection{\textct{ι}}
+\subsection{\textct{ι} Universal}
 
-We are now prepared to confront Chris Barker's universal \textct{ι} combinator, which yields all the others.\footnote{\href{https://web.archive.org/web/20160823182917/http://semarch.linguistics.fas.nyu.edu/barker/Iota/}{\citet{Barker2001}}.}  \textct{ι} is truly weird and has no direct analogue in human language or legible operators; it represents a kind of ultimate compression, a single combinator that can express all the others.  \textct{ι} can be defined as follows in the \textsc{SK} system:
+We are now prepared to confront Chris Barker's universal \textct{ι} combinator, which yields all the others.\footnote{\href{https://web.archive.org/web/20160823182917/http://semarch.linguistics.fas.nyu.edu/barker/Iota/}{\citet{Barker2001}}.}  \textct{ι} is truly weird and has no direct analogue in human language or legible operators; it represents a kind of ultimate compression, a single combinator that can express all the others.  \textct{ι} can be expressed as follows in the \textsc{SK} system:
 
 \begin{lstlisting}[style=listingcomb]
 ι x = x S K
 \end{lstlisting}
 
 \noindent
-From this definition, we can derive the other combinators, such as \textct{S} and \textct{K} (and \emph{a fortiori} the rest):
+It's important to emphasize that this is an explanatory definition, not a constructive one.  It tells us how \textct{ι} behaves, but we don't \emph{need} \textct{S} and \textct{K} to define it, only as a description here.  From this definition of \textct{ι}, we can derive the other combinators, such as \textct{S} and \textct{K} (and \emph{a fortiori} the rest):
 
 \begin{lstlisting}[style=listingcomb]
 K = ι (ι (ι ι))
@@ -201,7 +235,9 @@ The derivations are somewhat complex, but this gives you a flavor:
 
 \textct{ι} serves as a boundary condition, a proof that the search for minimality has a known terminus, but that terminus is not where we want to live.\footnote{Barker from the beginning encourage the exploration of the \textct{ι} combinator space.}
 % https://stackoverflow.com/questions/7368507/expressing-y-in-term-of-ski-combinators-in-javascript
-Combinator calculi (and their cousin, the lambda calculus) are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  This austerity motivates why Nock has twelve opcodes rather than merely one or two:  practical expressiveness is the design criterion, not theoretical minimality.  The spec is engineered to its purpose rather than being the smallest possible size.  It is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
+Nor are these the only combinators that can be defined; Raymond Smullyan's \emph{To Mock a Mockingbird} (1985) is a treasure trove of combinator systems.  For example, the Turing \textsc{Θ} combinator can be used to express recursion without the need for \textct{Y}.  The number of combinator systems is unbounded, and they can be constructed in various ways to suit different purposes.
+
+That said, combinator calculi (and their cousin, the lambda calculus) are generally considered too minimalist for practical programming; they shine, however, in mathematical proofs.  This means that we can use them to define a standard of behavior for an algorithm, but implement the logic in a compliant form using whatever computational tools we like.  This austerity motivates why Nock has twelve opcodes rather than merely one or two:  practical expressiveness is the design criterion, not theoretical minimality.  The spec is engineered to its purpose rather than being the smallest possible size.  It is better to think of Nock not as a bare programming language, but as a standard of computation which can under many circumstances be used as the computation itself.\footnote{Consideration of when to do so is largely driven by performance bottlenecks.}
 
 Nock is also a changing specification, albeit slowly and within finite bounds.  Nock embeds its own hyperstition by ``kelvin versioning'' or a cooling refinement:  it is drawn inexorably towards a particular future, and so it is not just a standard of computation but a standard of the future of computation.  That is, at each revision, it becomes more and more difficult to change, until Nock finally freezes at revision 0K.
 
@@ -516,7 +552,7 @@ Given that the natural numbers are built into Nock via both atoms and the tree a
 
 Two salient structure checks are provided in Nock:  a cell check, which results in \textct{TRUE}/\textct{0} if the argument is a cell and \textct{FALSE}/\textct{1} otherwise (only an atom); and an equality check, which results in \textct{TRUE}/\textct{0} if the two arguments are equal and \textct{FALSE}/\textct{1} otherwise.  These are implemented as opcodes 3 and 5, respectively.
 
-There are not equivalent combinators in the \textct{SKI} calculus for these checks since \textct{SKI} does not know about any structure for its arguments.  %TODO true?
+There are not equivalent combinators in the \textct{SKI} calculus for these checks since because \textct{SKI} has no notion of structure for its arguments.  \textct{SKI} operates on functions as black boxes and cannot inspect whether an argument is a pair or an atom.
 
 (This pair of opcodes implies the possible desirability of a general-purpose structural check in Nock, which would match the overall binary tree layout of two nouns but not check the actual values of the atom leafs.  Thus \textct{[0 1 2]} would match \textct{[0 1 2]} and \textct{[0 1 3]}, but not \textct{[[0 1] 2 3]} or \textct{[0 1]}.)
 
@@ -663,12 +699,14 @@ Thus Nock can express all $\mu$-recursive functions.
 
 \section{A Stateful Nock Kernel}
 
-Nock is a crash-only pure language, which means at the base level it can only succeed and yield a new noun:  no side effects, no exceptions, no state.  Like a castaway on a desert island, we must build everything we need from raw materials at hand.
+Nock is a crash-only pure language, which means at the base level it either fail (and crash) or succeed (and yield a new noun):  there are no side effects, no exceptions, and no state.  Like a castaway on a desert island, we must build everything we need from the raw materials at hand.
 
-Nock has one trick built in and a couple of design patterns to help us get there:
+Thus far, we have said nothing practical about combinators:  they live in an authochthonous sphere, hermetically sealed from the environment.  This is what is meant by ``purity'' in the functional programming sense:  the result of a function is entirely determined by its explicit input arguments, without any side effects or reliance on external state.  This is a powerful property that allows for easier reasoning about code and enables certain optimizations, but it also means that we need to find ways to interact with the outside world and maintain state across computations.
+
+Nock provides us with a single escape hatch, a set of flags to the outside world which trigger impure side effects:  opcode 11.  Combined with a couple of design patterns, we can thereby escape the autochthon and construct a practical Nock kernel that can maintain state and interact with the environment.
 
 \begin{enumerate}
-  \item  Opcode 11 lets us send a hint to the runtime, which can be used to trigger side effects.  The Nock expression formally doesn't know anything about these, but we can use them to print results, read input, and so forth.
+  \item  Opcode 11 lets us send a hint to the runtime, which can be used to trigger side effects.  The Nock expression formally doesn't know anything about these, but we can use them to print results, request input, and so forth.
   \item  The runtime can maintain state outside of Nock and supply it as a subject to subsequent Nock expressions.  We will do a lot more with this later, but we want to highlight it as a key affordance now.
   \item  The virtualization pattern means that we can run Nock in Nock.
 \end{enumerate}
@@ -690,23 +728,6 @@ That is, apply the Nock formula against a subject pair consisting of the current
 % https://github.com/urbit/examples/blob/master/wip/lib/nock.hoon
 % https://en.wikipedia.org/wiki/Turing_machine_examples
 
-\section{Virtualization}
-
-TODO derivation of Nock \textct{+mock}
-
-What could we want in a virtualized Nock environment?
-
-Traditionally, opcode 12 has been used to permit the hyper-Turing ``scry'' operator, which allows you to look up a bound persistent value in a referentially transparent way.  This is especially useful when a necessary value is not available in the current subject or needs to be supplied by the runtime (such as a system date or entropy).
-
-We can also implement the combinators as extended Nock opcodes, aiding us in building more complex expressions from our higher-level language compiler when we get there.
-
-\begin{enumerate}
-  \item[13.]  \textct{B} composition operator
-  \item[14.]  \textct{C} flip operator
-  \item[15.]  \textct{W} join operator
-  \item[16.]  \textct{U} duplication operator
-  \item[17.]  \textct{XXX}
-\end{enumerate}
 
 https://web.archive.org/web/20070716223000/https://homepages.nyu.edu/~cb125/Lambda/ski.html
 https://komiamiko.me/math/ordinals/2020/06/21/ski-numerals.html
